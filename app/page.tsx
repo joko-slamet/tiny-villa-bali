@@ -3,19 +3,7 @@ import HeroSection from './components/HeroSection'
 import ScrollReveal from './components/ScrollReveal'
 import StaggerGrid from './components/StaggerGrid'
 import ProjectCardMotion from './components/ProjectCardMotion'
-
-const skills = [
-  { icon: '⚡', name: 'React / Next.js' },
-  { icon: '🎨', name: 'Framer Motion' },
-  { icon: '🌐', name: 'Three.js / WebGL' },
-  { icon: '💅', name: 'GSAP + ScrollTrigger' },
-  { icon: '🔷', name: 'TypeScript' },
-  { icon: '🎯', name: 'CSS Animations' },
-  { icon: '🖼️', name: 'UI/UX Design' },
-  { icon: '🚀', name: 'Web Performance' },
-  { icon: '🤖', name: 'Claude AI' },
-  { icon: '☁️', name: 'Vercel / Edge' },
-]
+import HorizontalSkills from './components/HorizontalSkills'
 
 const services = [
   {
@@ -27,13 +15,13 @@ const services = [
   {
     icon: '◈',
     title: '3D & WebGL',
-    desc: 'Immersive 3D experiences, particle systems, and custom GLSL shaders powered by Three.js.',
+    desc: 'Immersive 3D experiences, particle systems, and glowing effects powered by Three.js and custom shaders.',
     color: '#a855f7',
   },
   {
     icon: '◇',
     title: 'Full-Stack Dev',
-    desc: 'Next.js App Router, server components, edge functions, and scalable API design.',
+    desc: 'Next.js App Router, server components, edge functions, and clean API design at any scale.',
     color: '#06b6d4',
   },
 ]
@@ -71,10 +59,10 @@ const featured = [
 export default function HomePage() {
   return (
     <>
-      {/* ── Hero (Framer Motion + Three.js) ───────────── */}
+      {/* ── Hero: Three.js bloom + Framer Motion text ──── */}
       <HeroSection />
 
-      {/* ── Services (GSAP stagger on scroll) ─────────── */}
+      {/* ── Services: GSAP stagger on scroll ──────────── */}
       <section
         style={{
           padding: 'clamp(60px,8vh,100px) clamp(24px,6vw,100px)',
@@ -126,49 +114,10 @@ export default function HomePage() {
         </StaggerGrid>
       </section>
 
-      {/* ── Skills (GSAP stagger) ──────────────────────── */}
-      <section
-        style={{
-          padding: 'clamp(40px,6vh,80px) clamp(24px,6vw,100px)',
-          borderTop: '1px solid var(--border)',
-        }}
-      >
-        <ScrollReveal
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 32,
-            flexWrap: 'wrap',
-            gap: 16,
-          }}
-        >
-          <div>
-            <div className="section-label">Tech Stack</div>
-            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' }}>
-              Tools &amp; Technologies
-            </h2>
-          </div>
-          <p style={{ color: 'var(--muted-2)', fontSize: '0.9rem', maxWidth: 320, lineHeight: 1.6 }}>
-            I stay on the cutting edge — using Claude AI to prototype animations
-            and ship faster without sacrificing quality.
-          </p>
-        </ScrollReveal>
+      {/* ── GSAP Horizontal scroll skills ─────────────── */}
+      <HorizontalSkills />
 
-        <StaggerGrid
-          stagger={0.06}
-          style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}
-        >
-          {skills.map(({ icon, name }) => (
-            <div key={name} className="skill-pill">
-              <span>{icon}</span>
-              {name}
-            </div>
-          ))}
-        </StaggerGrid>
-      </section>
-
-      {/* ── Featured Work (Framer Motion 3D tilt cards) ── */}
+      {/* ── Featured Work: Framer Motion 3D tilt cards ── */}
       <section
         style={{
           padding: 'clamp(60px,8vh,100px) clamp(24px,6vw,100px)',
@@ -194,7 +143,7 @@ export default function HomePage() {
           </Link>
         </ScrollReveal>
 
-        {/* Featured large cards */}
+        {/* Large 2-column featured */}
         <div
           style={{
             display: 'grid',
@@ -232,7 +181,7 @@ export default function HomePage() {
         <ScrollReveal>
           <div
             style={{
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(168,85,247,0.12) 100%)',
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.12))',
               border: '1px solid rgba(99,102,241,0.25)',
               borderRadius: 24,
               padding: 'clamp(40px,6vw,72px)',
@@ -242,9 +191,9 @@ export default function HomePage() {
             }}
           >
             <div style={{
-              position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)',
-              width: 300, height: 300,
-              background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
+              position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)',
+              width: 360, height: 360,
+              background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
               pointerEvents: 'none',
             }} />
             <div className="section-label">Ready to start?</div>
@@ -260,7 +209,8 @@ export default function HomePage() {
               <span className="gradient-text">extraordinary</span>
             </h2>
             <p style={{ color: 'var(--muted-2)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>
-              Drop me a message and I&apos;ll get back within 24 hours. Let&apos;s talk about your vision.
+              Drop me a message and I&apos;ll get back within 24 hours.
+              Let&apos;s talk about your vision.
             </p>
             <Link href="/contact" className="btn-primary" transitionTypes={['nav-forward']}>
               Start a Conversation ✉️

@@ -4,21 +4,16 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 
-const ThreeBackground = dynamic(() => import('./ThreeBackground'), { ssr: false })
+// Load Three.js scene client-side only (no SSR)
+const ThreeHeroScene = dynamic(() => import('./ThreeHeroScene'), { ssr: false })
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: (delay = 0) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
-  }),
-}
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number]
 
-const stats = [
-  { n: '40+', label: 'Projects Delivered' },
-  { n: '5yr', label: 'Experience' },
-  { n: '98%', label: 'Client Satisfaction' },
-]
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 36 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease, delay },
+})
 
 export default function HeroSection() {
   return (
@@ -29,47 +24,48 @@ export default function HeroSection() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        padding: 'clamp(60px,10vh,120px) clamp(24px,6vw,100px)',
+        background: '#08080f',
       }}
     >
-      {/* Three.js particle canvas */}
-      <ThreeBackground />
+      {/* ── Three.js: full-screen bloom scene ───────────── */}
+      <ThreeHeroScene />
 
-      {/* Soft orb overlays */}
-      <div className="orb orb-1" />
-      <div className="orb orb-2" />
-
-      {/* Dot grid */}
+      {/* ── Left gradient fade (so text stays readable) ── */}
       <div
         aria-hidden
         style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%)',
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(90deg, rgba(8,8,15,0.92) 0%, rgba(8,8,15,0.7) 45%, rgba(8,8,15,0.1) 100%)',
+          zIndex: 1,
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Text content */}
-      <div style={{ position: 'relative', zIndex: 2, maxWidth: 820 }}>
+      {/* ── Text content ─────────────────────────────────── */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          width: '100%',
+          maxWidth: '52%',
+          padding: 'clamp(60px,10vh,120px) 0 clamp(60px,10vh,120px) clamp(24px,6vw,100px)',
+        }}
+      >
         <motion.div
           className="hero-badge"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.85, x: -20 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ duration: 0.6, ease }}
         >
           Available for projects · 2025
         </motion.div>
 
         <motion.h1
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.1}
+          {...fadeUp(0.12)}
           style={{
-            fontSize: 'clamp(2.8rem, 7vw, 5.5rem)',
+            fontSize: 'clamp(2.6rem, 5vw, 5rem)',
             fontWeight: 900,
-            lineHeight: 1.05,
+            lineHeight: 1.06,
             letterSpacing: '-2px',
             marginBottom: 24,
           }}
@@ -81,32 +77,26 @@ export default function HeroSection() {
         </motion.h1>
 
         <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.22}
+          {...fadeUp(0.24)}
           style={{
-            fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+            fontSize: 'clamp(0.95rem, 1.5vw, 1.15rem)',
             color: 'var(--muted-2)',
-            lineHeight: 1.7,
-            maxWidth: 560,
+            lineHeight: 1.75,
+            maxWidth: 520,
             marginBottom: 40,
           }}
         >
           Full-stack developer specialising in{' '}
-          <strong style={{ color: 'var(--text)' }}>premium animations</strong>,
-          interactive UI, and AI-assisted development. I turn complex design visions
-          into buttery-smooth reality using{' '}
-          <strong style={{ color: 'var(--accent-1)' }}>Framer Motion</strong>,{' '}
-          <strong style={{ color: 'var(--accent-2)' }}>GSAP</strong>, and{' '}
-          <strong style={{ color: 'var(--accent-3)' }}>Three.js</strong>.
+          <strong style={{ color: 'var(--text)' }}>premium animations</strong>{' '}
+          and interactive UI. I ship impressive results using{' '}
+          <strong style={{ color: '#818cf8' }}>Framer Motion</strong>,{' '}
+          <strong style={{ color: '#c084fc' }}>GSAP</strong>, and{' '}
+          <strong style={{ color: '#22d3ee' }}>Three.js</strong> — accelerated by
+          Claude AI.
         </motion.p>
 
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.32}
+          {...fadeUp(0.35)}
           style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}
         >
           <Link href="/projects" className="btn-primary" transitionTypes={['nav-forward']}>
@@ -117,80 +107,66 @@ export default function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stat row */}
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.48}
-          style={{ display: 'flex', gap: 48, marginTop: 60, flexWrap: 'wrap' }}
+          {...fadeUp(0.5)}
+          style={{ display: 'flex', gap: 40, marginTop: 56, flexWrap: 'wrap' }}
         >
-          {stats.map(({ n, label }) => (
-            <div key={label}>
+          {[
+            { n: '40+', label: 'Projects Delivered' },
+            { n: '5yr', label: 'Experience' },
+            { n: '98%', label: 'Client Satisfaction' },
+          ].map(({ n, label }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.55 + i * 0.1 }}
+            >
               <div
                 className="gradient-text"
                 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-1px' }}
               >
                 {n}
               </div>
-              <div style={{ fontSize: '0.82rem', color: 'var(--muted-2)', marginTop: 2 }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--muted-2)', marginTop: 3 }}>
                 {label}
               </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
 
-      {/* Decorative orbit ring */}
+      {/* ── Scroll indicator ─────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.7 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        aria-hidden
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
         style={{
           position: 'absolute',
-          right: 'clamp(40px, 10vw, 160px)',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 320, height: 320,
-          display: 'grid',
-          placeItems: 'center',
-          pointerEvents: 'none',
-          zIndex: 1,
+          bottom: 32,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8,
+          zIndex: 2,
+          color: 'var(--muted)',
+          fontSize: '0.72rem',
+          letterSpacing: '2px',
+          textTransform: 'uppercase',
         }}
       >
-        <div style={{
-          position: 'absolute', inset: 0,
-          border: '1px dashed rgba(99,102,241,0.2)',
-          borderRadius: '50%',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 32,
-          border: '1px dashed rgba(168,85,247,0.2)',
-          borderRadius: '50%',
-          animation: 'spin-slow 20s linear infinite',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 64,
-          border: '1px solid rgba(6,182,212,0.15)',
-          borderRadius: '50%',
-          animation: 'spin-slow 14s linear infinite reverse',
-        }} />
+        <span>Scroll</span>
         <motion.div
-          animate={{ scale: [0.85, 1, 0.85], boxShadow: ['0 0 0 0 rgba(99,102,241,0.5)', '0 0 0 18px rgba(99,102,241,0)', '0 0 0 0 rgba(99,102,241,0.5)'] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           style={{
-            width: 80, height: 80,
-            background: 'var(--grad)',
-            borderRadius: '50%',
-            display: 'grid',
-            placeItems: 'center',
-            fontSize: '1.8rem',
-            color: '#fff',
+            width: 1.5, height: 32,
+            background: 'linear-gradient(to bottom, rgba(99,102,241,0.8), transparent)',
           }}
-        >
-          ✦
-        </motion.div>
+        />
       </motion.div>
     </section>
   )

@@ -32,7 +32,7 @@ export default function SocialLinks() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.45, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] }}
             whileHover={{
               borderColor: 'rgba(99,102,241,0.4)',
               background: 'rgba(99,102,241,0.06)',
