@@ -15,27 +15,38 @@ const images = [
   { src: '/assets/images/2_bed.jpeg', alt: 'Bedroom 2', bg: '#cebeaf' },
 ]
 
-const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? '120vw' : '-120vw' }),
-  center: { x: 0 },
-  exit:  (dir: number) => ({ x: dir > 0 ? '-120vw' : '120vw' }),
+// Sweep: slides in/out with a slight angle — not purely linear.
+const sweepVariants = {
+  enter: (dir: number) => ({
+    x:       dir > 0 ? '80%'  : '-80%',
+    rotateY: dir > 0 ? 30     : -30,
+    scale:   0.82,
+    opacity: 0,
+  }),
+  center: { x: '0%', rotateY: 0, scale: 1, opacity: 1 },
+  exit:   (dir: number) => ({
+    x:       dir > 0 ? '-80%' : '80%',
+    rotateY: dir > 0 ? -30    : 30,
+    scale:   0.82,
+    opacity: 0,
+  }),
 }
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const tiltRef = useRef<HTMLDivElement>(null)
   const [current, setCurrent]     = useState(0)
   const [direction, setDirection] = useState(1)
 
   const mx  = useMotionValue(0)
   const my  = useMotionValue(0)
-  const smx = useSpring(mx, { stiffness: 100, damping: 16 })
-  const smy = useSpring(my, { stiffness: 100, damping: 16 })
+  const smx = useSpring(mx, { stiffness: 60, damping: 18 })
+  const smy = useSpring(my, { stiffness: 60, damping: 18 })
 
-  const rotateY = useTransform(smx, [-1, 1], [-14, 14])
-  const rotateX = useTransform(smy, [-1, 1], [10, -10])
+  const tiltY = useTransform(smx, [-1, 1], [-6, 6])
+  const tiltX = useTransform(smy, [-1, 1], [4, -4])
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = containerRef.current?.getBoundingClientRect()
+    const rect = tiltRef.current?.getBoundingClientRect()
     if (!rect) return
     mx.set((e.clientX - rect.left) / rect.width * 2 - 1)
     my.set((e.clientY - rect.top)  / rect.height * 2 - 1)
@@ -84,55 +95,65 @@ export default function HeroSection() {
       <div className="orb orb-1" style={{ opacity: 0.45 }} />
       <div className="orb orb-3" style={{ opacity: 0.3  }} />
 
-      {/* Card */}
+      {/* Subtle mouse-tilt wrapper */}
       <div
-        ref={containerRef}
+        ref={tiltRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{
-          perspective: 1200,
-          width: '100%',
-          maxWidth: 780,
-          position: 'relative',
-          zIndex: 1,
-        }}
+        style={{ width: '100%', maxWidth: 780, position: 'relative', zIndex: 1 }}
       >
         <motion.div
           initial={{ opacity: 0, y: 48, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            rotateX,
-            rotateY,
-            transformStyle: 'preserve-3d',
-            position: 'relative',
-          }}
+          style={{ rotateX: tiltX, rotateY: tiltY }}
         >
-          <AnimatePresence initial={false} custom={direction} mode="wait">
-            <motion.div
-              key={current}
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              style={{ borderRadius: 28, overflow: 'hidden' }}
-            >
-              <Image
-                src={images[current].src}
-                alt={images[current].alt}
-                width={2500}
-                height={2500}
-                style={{ display: 'block', width: '100%', height: 'auto' }}
-                priority
-              />
-            </motion.div>
-          </AnimatePresence>
+          {/*
+            Perspective is set HERE — direct parent of the rotating elements.
+            This makes the rotateY feel like the user is standing inside
+            a wide-angle room and turning their head.
+          */}
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '1514 / 651',
+              perspective: '1000px',
+              perspectiveOrigin: '50% 50%',
+            }}
+          >
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={current}
+                custom={direction}
+                variants={sweepVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: 28,
+                  overflow: 'hidden',
+                  /* backface-visibility hidden prevents flash on 90° midpoint */
+                  backfaceVisibility: 'hidden',
+                }}
+              >
+                <Image
+                  src={images[current].src}
+                  alt={images[current].alt}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  priority
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </motion.div>
       </div>
 
-      {/* Left arrow — screen edge */}
+      {/* Left arrow */}
       <AnimatePresence>
         {current > 0 && (
           <motion.button
@@ -153,7 +174,7 @@ export default function HeroSection() {
         )}
       </AnimatePresence>
 
-      {/* Right arrow — screen edge */}
+      {/* Right arrow */}
       <AnimatePresence>
         {current < images.length - 1 && (
           <motion.button
@@ -173,7 +194,6 @@ export default function HeroSection() {
           </motion.button>
         )}
       </AnimatePresence>
-
     </motion.section>
   )
 }
