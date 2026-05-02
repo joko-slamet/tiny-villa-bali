@@ -15,21 +15,12 @@ const images = [
   { src: '/assets/images/2_bed.jpeg', alt: 'Bedroom 2', bg: '#cebeaf' },
 ]
 
-// Sweep: slides in/out with a slight angle — not purely linear.
+// Pivot at viewer: pure rotateY, transformOrigin pushed to the viewer's eye position.
+// No x translation — perspective geometry handles the lateral arc naturally.
 const sweepVariants = {
-  enter: (dir: number) => ({
-    x:       dir > 0 ? '80%'  : '-80%',
-    rotateY: dir > 0 ? 30     : -30,
-    scale:   0.82,
-    opacity: 0,
-  }),
-  center: { x: '0%', rotateY: 0, scale: 1, opacity: 1 },
-  exit:   (dir: number) => ({
-    x:       dir > 0 ? '-80%' : '80%',
-    rotateY: dir > 0 ? -30    : 30,
-    scale:   0.82,
-    opacity: 0,
-  }),
+  enter: (dir: number) => ({ rotateY: dir > 0 ? 80 : -80 }),
+  center: { rotateY: 0 },
+  exit:   (dir: number) => ({ rotateY: dir > 0 ? -80 : 80 }),
 }
 
 export default function HeroSection() {
@@ -118,7 +109,7 @@ export default function HeroSection() {
               position: 'relative',
               width: '100%',
               aspectRatio: '1514 / 651',
-              perspective: '1000px',
+              perspective: '900px',
               perspectiveOrigin: '50% 50%',
             }}
           >
@@ -130,14 +121,13 @@ export default function HeroSection() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
                 style={{
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 28,
                   overflow: 'hidden',
-                  /* backface-visibility hidden prevents flash on 90° midpoint */
-                  backfaceVisibility: 'hidden',
+                  transformOrigin: 'center center 900px',
                 }}
               >
                 <Image
