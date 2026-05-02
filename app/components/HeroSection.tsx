@@ -9,6 +9,7 @@ import {
   AnimatePresence,
 } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const images = [
   { src: '/assets/images/1_bed.jpeg', alt: 'Bedroom 1', bg: '#cec4b1' },
@@ -140,6 +141,23 @@ export default function HeroSection() {
               </motion.div>
             </AnimatePresence>
           </div>
+        </motion.div>
+
+        {/* Button below image */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}
+        >
+          <Link href="/map" className="btn-primary" transitionTypes={['nav-forward']}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+              <line x1="9" y1="3" x2="9" y2="18"/>
+              <line x1="15" y1="6" x2="15" y2="21"/>
+            </svg>
+            View Location
+          </Link>
         </motion.div>
       </div>
 
