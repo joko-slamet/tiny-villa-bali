@@ -1,173 +1,179 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-import dynamic from 'next/dynamic'
+import { useRef, useState } from 'react'
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  AnimatePresence,
+} from 'framer-motion'
+import Image from 'next/image'
 
-// Load Three.js scene client-side only (no SSR)
-const ThreeHeroScene = dynamic(() => import('./ThreeHeroScene'), { ssr: false })
+const images = [
+  { src: '/assets/images/1_bed.jpeg', alt: 'Bedroom 1', bg: '#cec4b1' },
+  { src: '/assets/images/2_bed.jpeg', alt: 'Bedroom 2', bg: '#cebeaf' },
+]
 
-const ease = [0.22, 1, 0.36, 1] as [number, number, number, number]
-
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 36 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease, delay },
-})
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? '120vw' : '-120vw' }),
+  center: { x: 0 },
+  exit:  (dir: number) => ({ x: dir > 0 ? '-120vw' : '120vw' }),
+}
 
 export default function HeroSection() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [current, setCurrent]     = useState(0)
+  const [direction, setDirection] = useState(1)
+
+  const mx  = useMotionValue(0)
+  const my  = useMotionValue(0)
+  const smx = useSpring(mx, { stiffness: 100, damping: 16 })
+  const smy = useSpring(my, { stiffness: 100, damping: 16 })
+
+  const rotateY = useTransform(smx, [-1, 1], [-14, 14])
+  const rotateX = useTransform(smy, [-1, 1], [10, -10])
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    mx.set((e.clientX - rect.left) / rect.width * 2 - 1)
+    my.set((e.clientY - rect.top)  / rect.height * 2 - 1)
+  }
+
+  function handleMouseLeave() { mx.set(0); my.set(0) }
+
+  function navigate(dir: number) {
+    const next = current + dir
+    if (next < 0 || next >= images.length) return
+    setDirection(dir)
+    setCurrent(next)
+  }
+
+  const arrowBase: React.CSSProperties = {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 48,
+    height: 48,
+    borderRadius: '50%',
+    border: '1px solid rgba(255,255,255,0.35)',
+    background: 'rgba(255,255,255,0.18)',
+    backdropFilter: 'blur(10px)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#1c1510',
+    zIndex: 10,
+  }
+
   return (
-    <section
+    <motion.section
+      animate={{ backgroundColor: images[current].bg }}
+      transition={{ duration: 0.65, ease: 'easeInOut' }}
       style={{
         minHeight: 'calc(100vh - var(--nav-h))',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: '#08080f',
       }}
     >
-      {/* ── Three.js: full-screen bloom scene ───────────── */}
-      <ThreeHeroScene />
+      <div className="orb orb-1" style={{ opacity: 0.45 }} />
+      <div className="orb orb-3" style={{ opacity: 0.3  }} />
 
-      {/* ── Left gradient fade (so text stays readable) ── */}
+      {/* Card */}
       <div
-        aria-hidden
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(90deg, rgba(8,8,15,0.92) 0%, rgba(8,8,15,0.7) 45%, rgba(8,8,15,0.1) 100%)',
-          zIndex: 1,
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* ── Text content ─────────────────────────────────── */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 2,
+          perspective: 1200,
           width: '100%',
-          maxWidth: '52%',
-          padding: 'clamp(60px,10vh,120px) 0 clamp(60px,10vh,120px) clamp(24px,6vw,100px)',
+          maxWidth: 780,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         <motion.div
-          className="hero-badge"
-          initial={{ opacity: 0, scale: 0.85, x: -20 }}
-          animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{ duration: 0.6, ease }}
-        >
-          Available for projects · 2025
-        </motion.div>
-
-        <motion.h1
-          {...fadeUp(0.12)}
+          initial={{ opacity: 0, y: 48, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            fontSize: 'clamp(2.6rem, 5vw, 5rem)',
-            fontWeight: 900,
-            lineHeight: 1.06,
-            letterSpacing: '-2px',
-            marginBottom: 24,
+            rotateX,
+            rotateY,
+            transformStyle: 'preserve-3d',
+            position: 'relative',
           }}
         >
-          Crafting{' '}
-          <span className="shimmer-text">High-End</span>
-          <br />
-          Web Experiences
-        </motion.h1>
-
-        <motion.p
-          {...fadeUp(0.24)}
-          style={{
-            fontSize: 'clamp(0.95rem, 1.5vw, 1.15rem)',
-            color: 'var(--muted-2)',
-            lineHeight: 1.75,
-            maxWidth: 520,
-            marginBottom: 40,
-          }}
-        >
-          Full-stack developer specialising in{' '}
-          <strong style={{ color: 'var(--text)' }}>premium animations</strong>{' '}
-          and interactive UI. I ship impressive results using{' '}
-          <strong style={{ color: '#818cf8' }}>Framer Motion</strong>,{' '}
-          <strong style={{ color: '#c084fc' }}>GSAP</strong>, and{' '}
-          <strong style={{ color: '#22d3ee' }}>Three.js</strong> — accelerated by
-          Claude AI.
-        </motion.p>
-
-        <motion.div
-          {...fadeUp(0.35)}
-          style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}
-        >
-          <Link href="/projects" className="btn-primary" transitionTypes={['nav-forward']}>
-            View Projects ↗
-          </Link>
-          <Link href="/contact" className="btn-outline" transitionTypes={['nav-forward']}>
-            {"Let's Talk"}
-          </Link>
-        </motion.div>
-
-        {/* Stat row */}
-        <motion.div
-          {...fadeUp(0.5)}
-          style={{ display: 'flex', gap: 40, marginTop: 56, flexWrap: 'wrap' }}
-        >
-          {[
-            { n: '40+', label: 'Projects Delivered' },
-            { n: '5yr', label: 'Experience' },
-            { n: '98%', label: 'Client Satisfaction' },
-          ].map(({ n, label }, i) => (
+          <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.55 + i * 0.1 }}
+              key={current}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              style={{ borderRadius: 28, overflow: 'hidden' }}
             >
-              <div
-                className="gradient-text"
-                style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-1px' }}
-              >
-                {n}
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--muted-2)', marginTop: 3 }}>
-                {label}
-              </div>
+              <Image
+                src={images[current].src}
+                alt={images[current].alt}
+                width={2500}
+                height={2500}
+                style={{ display: 'block', width: '100%', height: 'auto' }}
+                priority
+              />
             </motion.div>
-          ))}
+          </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* ── Scroll indicator ─────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.8 }}
-        style={{
-          position: 'absolute',
-          bottom: 32,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 8,
-          zIndex: 2,
-          color: 'var(--muted)',
-          fontSize: '0.72rem',
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span>Scroll</span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            width: 1.5, height: 32,
-            background: 'linear-gradient(to bottom, rgba(99,102,241,0.8), transparent)',
-          }}
-        />
-      </motion.div>
-    </section>
+      {/* Left arrow — screen edge */}
+      <AnimatePresence>
+        {current > 0 && (
+          <motion.button
+            key="left"
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => navigate(-1)}
+            style={{ ...arrowBase, left: 16 }}
+            whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.32)' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Right arrow — screen edge */}
+      <AnimatePresence>
+        {current < images.length - 1 && (
+          <motion.button
+            key="right"
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 16 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => navigate(1)}
+            style={{ ...arrowBase, right: 16 }}
+            whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.32)' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+    </motion.section>
   )
 }

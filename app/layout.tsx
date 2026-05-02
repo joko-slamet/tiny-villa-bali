@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "dev.folio — Creative Developer & Animation Specialist",
+  title: "Villa Serenara — Luxury Private Villa, Bali",
   description:
-    "Portfolio of a full-stack developer specialising in high-end web animations, Framer Motion, GSAP, and Three.js experiences.",
+    "An exclusive 5-bedroom private villa in Ubud, Bali. Infinity pool, private chef, spa pavilion, and bespoke concierge service.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <CursorWrapper />
+        {/* <CursorWrapper /> */}
         <Navigation />
         <main style={{ paddingTop: "var(--nav-h)" }}>{children}</main>
       </body>

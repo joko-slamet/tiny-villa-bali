@@ -1,10 +1,7 @@
 'use client'
 
-import { useEffect, useRef, ReactNode } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -12,38 +9,34 @@ interface Props {
   stagger?: number
 }
 
-export default function StaggerGrid({ children, style, stagger = 0.12 }: Props) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    const items = el.children
-    gsap.fromTo(
-      items,
-      { opacity: 0, y: 50, scale: 0.94 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.7,
-        stagger,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      }
-    )
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
-  }, [stagger])
-
+export default function StaggerGrid({ children, style, stagger = 0.1 }: Props) {
   return (
-    <div ref={ref} style={style}>
+    <motion.div
+      style={style}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-60px' }}
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: stagger } },
+      }}
+    >
       {children}
-    </div>
+    </motion.div>
+  )
+}
+
+export function StaggerItem({ children, style, className }: { children: ReactNode; style?: React.CSSProperties; className?: string }) {
+  return (
+    <motion.div
+      style={style}
+      className={className}
+      variants={{
+        hidden: { opacity: 0, y: 40, scale: 0.95 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+      }}
+    >
+      {children}
+    </motion.div>
   )
 }
