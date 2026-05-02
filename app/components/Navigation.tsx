@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation'
 
 const links = [
   { href: '/',         label: 'Home' },
-  { href: '/projects', label: 'Gallery' },
-  { href: '/contact',  label: 'Book a Stay' },
+  // { href: '/projects', label: 'Gallery' },
+  // { href: '/contact',  label: 'Book a Stay' },
 ]
 
 export default function Navigation() {
@@ -15,7 +15,7 @@ export default function Navigation() {
   return (
     <nav className="nav" style={{ viewTransitionName: 'site-nav' }}>
       <Link href="/" className="nav-logo">
-        Villa <span>Serenara</span>
+        Villa
       </Link>
       <ul className="nav-links">
         {links.map(({ href, label }) => (
