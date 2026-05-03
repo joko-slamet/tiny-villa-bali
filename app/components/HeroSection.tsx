@@ -12,8 +12,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const images = [
-  { src: '/assets/images/1_bed.jpeg', alt: 'Bedroom 1', bg: '#cec4b1' },
-  { src: '/assets/images/2_bed.jpeg', alt: 'Bedroom 2', bg: '#cebeaf' },
+  { src: '/assets/images/1_bed_new.png', alt: 'Bedroom 1', bg: '#cec4b1' },
+  { src: '/assets/images/2_bed_new.png', alt: 'Bedroom 2', bg: '#cebeaf' },
 ]
 
 const sweepVariants = {
