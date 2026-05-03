@@ -23,7 +23,7 @@ const details: Record<string, {
     description:
       'Nestled in the heart of Ubud, Villa Serenara is an exclusive sanctuary surrounded by lush tropical gardens and the gentle sounds of a nearby river. Perched on a private 1.5-hectare estate, the villa commands unobstructed views across the jungle canopy — a world apart from everything ordinary.',
     coords: '8°30\'25"S  115°15\'45"E',
-    image: '/assets/images/1_bed.jpeg',
+    image: '/assets/images/1_bed_new.png',
     facts: [
       { icon: '✈️', label: 'Airport', value: '45 min from Ngurah Rai' },
       { icon: '🌿', label: 'Estate', value: '1.5 hectares private' },
@@ -40,7 +40,7 @@ const details: Record<string, {
     description:
       'Ngurah Rai International Airport is Bali\'s principal gateway, connecting the island to major cities across Asia, Australia, and Europe. Our dedicated concierge team coordinates seamless private transfers directly to Villa Serenara — your journey into luxury begins the moment you land.',
     coords: '8°44\'48"S  115°10\'2"E',
-    image: '/assets/images/2_bed.jpeg',
+    image: '/assets/images/2_bed_new.png',
     facts: [
       { icon: '✈️', label: 'Routes', value: 'SIN · KUL · SYD · DOH' },
       { icon: '🚗', label: 'Transfer', value: '45 min to Villa Serenara' },
