@@ -3,6 +3,7 @@
 import { use } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -12,36 +13,57 @@ const details: Record<string, {
   address: string
   description: string
   coords: string
-  facts: { icon: string; text: string }[]
+  image: string
+  facts: { icon: string; label: string; value: string }[]
 }> = {
   'villa-serenara': {
     name: 'Villa Serenara',
     label: 'Our Villa',
     address: 'Jl. Raya Ubud, Ubud, Gianyar Regency, Bali 80571',
     description:
-      'Nestled in the heart of Ubud, Villa Serenara offers an exclusive retreat surrounded by lush tropical gardens and the gentle sounds of a nearby river. The villa sits on a private 1.5-hectare estate with unobstructed views of the jungle canopy.',
-    coords: '-8.5069, 115.2625',
+      'Nestled in the heart of Ubud, Villa Serenara is an exclusive sanctuary surrounded by lush tropical gardens and the gentle sounds of a nearby river. Perched on a private 1.5-hectare estate, the villa commands unobstructed views across the jungle canopy — a world apart from everything ordinary.',
+    coords: '8°30\'25"S  115°15\'45"E',
+    image: '/assets/images/1_bed.jpeg',
     facts: [
-      { icon: '🚗', text: '45 min from Ngurah Rai Airport' },
-      { icon: '🌿', text: 'Set within 1.5 ha of private tropical garden' },
-      { icon: '🏞️', text: 'Overlooking Campuhan Ridge jungle valley' },
-      { icon: '🛕', text: '5 min walk to Ubud Sacred Monkey Forest' },
+      { icon: '✈️', label: 'Airport', value: '45 min from Ngurah Rai' },
+      { icon: '🌿', label: 'Estate', value: '1.5 hectares private' },
+      { icon: '🏞️', label: 'View', value: 'Campuhan Ridge jungle' },
+      { icon: '🛕', label: 'Nearby', value: 'Sacred Monkey Forest' },
+      { icon: '🏊', label: 'Pool', value: '20m infinity pool' },
+      { icon: '🍽️', label: 'Dining', value: 'Private chef on request' },
     ],
   },
   'ngurah-rai': {
-    name: 'Ngurah Rai International Airport',
+    name: 'Ngurah Rai Airport',
     label: 'Nearest Airport',
     address: 'Jl. Raya Gusti Ngurah Rai, Tuban, Kuta, Badung Regency, Bali 80361',
     description:
-      'Ngurah Rai International Airport is the main international gateway to Bali, serving direct flights from major cities across Asia, Australia, and Europe. Our concierge team can arrange private airport transfers directly to Villa Serenara.',
-    coords: '-8.7467, 115.1671',
+      'Ngurah Rai International Airport is Bali\'s principal gateway, connecting the island to major cities across Asia, Australia, and Europe. Our dedicated concierge team coordinates seamless private transfers directly to Villa Serenara — your journey into luxury begins the moment you land.',
+    coords: '8°44\'48"S  115°10\'2"E',
+    image: '/assets/images/2_bed.jpeg',
     facts: [
-      { icon: '✈️', text: 'Direct flights from SIN, KUL, SYD, DOH & more' },
-      { icon: '🚗', text: '45 min drive north to Villa Serenara' },
-      { icon: '🧳', text: 'Private transfer available — contact concierge' },
-      { icon: '🕐', text: 'Terminal 2 for all international arrivals' },
+      { icon: '✈️', label: 'Routes', value: 'SIN · KUL · SYD · DOH' },
+      { icon: '🚗', label: 'Transfer', value: '45 min to Villa Serenara' },
+      { icon: '🧳', label: 'Arrival', value: 'Terminal 2 international' },
+      { icon: '🕐', label: 'Service', value: 'Private transfer 24 / 7' },
+      { icon: '💼', label: 'Concierge', value: 'Meet & greet available' },
+      { icon: '🛂', label: 'Visa', value: 'Visa on arrival for 80+ nations' },
     ],
   },
+}
+
+function Divider() {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 16, margin: '40px 0',
+    }}>
+      <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 0l2 6h6l-5 3.6 1.9 6L8 12 3.1 15.6 5 9.6 0 6h6z" fill="var(--accent-1)" opacity="0.6"/>
+      </svg>
+      <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+    </div>
+  )
 }
 
 export default function LocationDetailPage({
@@ -61,122 +83,204 @@ export default function LocationDetailPage({
   }
 
   return (
-    <motion.section
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      style={{
-        minHeight: 'calc(100vh - var(--nav-h))',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'clamp(40px, 6vh, 80px) clamp(24px, 6vw, 80px)',
-        background: 'var(--bg)',
-      }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      <div style={{ width: '100%', maxWidth: 640 }}>
+      {/* Hero image */}
+      <div style={{ position: 'relative', height: 'clamp(260px, 42vh, 520px)', overflow: 'hidden' }}>
+        <Image
+          src={detail.image}
+          alt={detail.name}
+          fill
+          style={{ objectFit: 'cover' }}
+          priority
+        />
+        {/* Gradient overlays */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.55) 100%)',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(184,146,42,0.12) 0%, transparent 60%)',
+        }} />
 
-        {/* Back */}
+        {/* Back button over hero */}
         <motion.div
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.05, ease }}
+          transition={{ duration: 0.45, delay: 0.1, ease }}
+          style={{ position: 'absolute', top: 28, left: 'clamp(24px, 5vw, 56px)' }}
         >
           <Link
             href="/map"
             transitionTypes={['nav-back']}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              color: 'var(--muted-2)',
-              textDecoration: 'none',
-              marginBottom: 32,
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.5px',
+              color: 'rgba(255,255,255,0.85)', textDecoration: 'none',
+              background: 'rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              padding: '8px 16px', borderRadius: 99,
+              transition: 'background 0.2s',
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
             Back to Map
           </Link>
         </motion.div>
 
-        <motion.p
-          className="section-label"
-          initial={{ opacity: 0, y: 14 }}
+        {/* Hero label + title over image */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease }}
+          transition={{ duration: 0.7, delay: 0.2, ease }}
+          style={{
+            position: 'absolute', bottom: 'clamp(28px, 5vh, 52px)',
+            left: 'clamp(24px, 5vw, 56px)',
+          }}
         >
-          {detail.label}
-        </motion.p>
+          <p style={{
+            fontSize: '0.7rem', fontWeight: 700, letterSpacing: '4px',
+            textTransform: 'uppercase', color: '#e8c870', marginBottom: 8,
+          }}>
+            {detail.label}
+          </p>
+          <h1 style={{
+            fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800,
+            color: '#fff', lineHeight: 1.1, letterSpacing: '-0.5px',
+            textShadow: '0 2px 24px rgba(0,0,0,0.3)',
+          }}>
+            {detail.name}
+          </h1>
+        </motion.div>
+      </div>
 
-        <motion.h1
-          className="section-title"
-          initial={{ opacity: 0, y: 18 }}
+      {/* Content */}
+      <div style={{
+        maxWidth: 800, margin: '0 auto',
+        padding: 'clamp(40px, 6vh, 72px) clamp(24px, 5vw, 56px)',
+      }}>
+
+        {/* Coords badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.16, ease }}
+          transition={{ duration: 0.5, delay: 0.3, ease }}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}
         >
-          {detail.name}
-        </motion.h1>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '6px 14px', borderRadius: 99,
+            border: '1px solid var(--border-h)',
+            background: 'var(--surface)',
+          }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            </svg>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', color: 'var(--muted-2)', fontFamily: 'var(--font-mono)' }}>
+              {detail.coords}
+            </span>
+          </div>
+        </motion.div>
 
+        {/* Description */}
         <motion.p
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.22, ease }}
-          style={{ color: 'var(--muted-2)', fontSize: '0.88rem', marginBottom: 24, marginTop: -8 }}
-        >
-          📍 {detail.address}
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.28, ease }}
-          style={{ color: 'var(--muted-2)', lineHeight: 1.75, marginBottom: 36 }}
+          transition={{ duration: 0.65, delay: 0.36, ease }}
+          style={{
+            fontSize: 'clamp(1rem, 1.6vw, 1.125rem)',
+            lineHeight: 1.85, color: 'var(--muted-2)',
+            fontWeight: 400,
+          }}
         >
           {detail.description}
         </motion.p>
 
-        {/* Facts */}
+        <Divider />
+
+        {/* Address */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.34, ease }}
+          transition={{ duration: 0.5, delay: 0.44, ease }}
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: 12,
+            padding: '20px 24px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 14,
+            marginBottom: 40,
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: 2, flexShrink: 0 }}>
+            <circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          </svg>
+          <span style={{ fontSize: '0.88rem', color: 'var(--muted-2)', lineHeight: 1.6 }}>{detail.address}</span>
+        </motion.div>
+
+        {/* Facts grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5, ease }}
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-            gap: 12,
-            marginBottom: 40,
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: 14,
           }}
         >
           {detail.facts.map((f, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.38 + i * 0.06, ease }}
-              className="card"
-              style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}
+              transition={{ duration: 0.45, delay: 0.54 + i * 0.05, ease }}
+              style={{
+                padding: '20px 22px',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 16,
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,146,42,0.4)'
+                ;(e.currentTarget as HTMLElement).style.background = 'rgba(184,146,42,0.04)'
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
+                ;(e.currentTarget as HTMLElement).style.background = 'var(--surface)'
+              }}
             >
-              <span style={{ fontSize: '1.2rem' }}>{f.icon}</span>
-              <span style={{ fontSize: '0.82rem', color: 'var(--muted-2)', lineHeight: 1.4 }}>{f.text}</span>
+              <div style={{ fontSize: '1.4rem', marginBottom: 10 }}>{f.icon}</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--accent-1)', marginBottom: 5 }}>{f.label}</div>
+              <div style={{ fontSize: '0.88rem', color: 'var(--text)', fontWeight: 500, lineHeight: 1.4 }}>{f.value}</div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Coords */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.55, ease }}
-          style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.82, ease }}
+          style={{ marginTop: 52, display: 'flex', gap: 14, flexWrap: 'wrap' }}
         >
-          {detail.coords}
-        </motion.p>
+          <Link href="/contact" className="btn-primary" transitionTypes={['nav-forward']}>
+            Book a Stay
+          </Link>
+          <Link href="/map" className="btn-outline" transitionTypes={['nav-back']}>
+            ← Back to Map
+          </Link>
+        </motion.div>
 
       </div>
-    </motion.section>
+    </motion.div>
   )
 }
