@@ -1,20 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem('isAuthenticated') === 'true') {
+      router.push('/admin/edit/home');
+    }
+  }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000); // Simulate login
+    
+    setTimeout(() => {
+      setIsLoading(false);
+      if (email === "mbuchacher2@example.com" && password === "password123") {
+        localStorage.setItem('isAuthenticated', 'true');
+        router.push("/admin/edit/home");
+      } else {
+        setError("Invalid email or password");
+      }
+    }, 1000);
   };
 
   return (
@@ -78,6 +97,11 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               
+              {error && (
+                <div style={{ padding: '12px 16px', backgroundColor: 'rgba(220, 38, 38, 0.1)', color: '#dc2626', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 500, border: '1px solid rgba(220, 38, 38, 0.2)' }}>
+                  {error}
+                </div>
+              )}
               <div className="form-group">
                 <label htmlFor="email" className="form-label" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.75rem' }}>
                   Email Address

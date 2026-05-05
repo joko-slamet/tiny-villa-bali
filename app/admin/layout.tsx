@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Image as ImageIcon, 
@@ -15,10 +15,22 @@ import Link from "next/link";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('isAuthenticated') !== 'true') {
+      router.push('/login');
+    } else {
+      setIsAuth(true);
+    }
+  }, [router]);
 
   const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
     router.push("/login");
   };
+
+  if (!isAuth) return null; // Prevent UI flash before redirect
 
   // Determine active tab based on path.
   let activeTab = 'dashboard'; 
