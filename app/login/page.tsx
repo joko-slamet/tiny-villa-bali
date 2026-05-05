@@ -69,7 +69,7 @@ export default function LoginPage() {
             <div style={{ marginBottom: '40px' }}>
               <span className="section-label" style={{ marginBottom: '12px' }}>Admin Portal</span>
               <h1 className="section-title" style={{ marginBottom: '16px' }}>
-                Admin Login
+                Login
               </h1>
               <p style={{ color: 'var(--muted-2)', fontSize: '1rem', lineHeight: 1.5 }}>
                 Sign in to manage content of Villa Serenara website.
