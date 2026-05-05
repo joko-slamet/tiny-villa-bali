@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const links = [
@@ -15,7 +16,7 @@ export default function Navigation() {
   return (
     <nav className="nav" style={{ viewTransitionName: 'site-nav' }}>
       <Link href="/" className="nav-logo">
-        Villa
+        <Image src="/assets/icons/logo.png" alt="Villa" width={180} height={40} />
       </Link>
       <ul className="nav-links">
         {links.map(({ href, label }) => (

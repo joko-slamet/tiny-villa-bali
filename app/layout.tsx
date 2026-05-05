@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Villa Serenara — Luxury Private Villa, Bali",
+  title: "Tiny Villa Bali - Modern Tropical villas",
   description:
-    "An exclusive 5-bedroom private villa in Ubud, Bali. Infinity pool, private chef, spa pavilion, and bespoke concierge service.",
+    "Modern Tropical villas designed for tropical living",
 };
 
 export default function RootLayout({
