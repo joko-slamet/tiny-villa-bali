@@ -21,6 +21,7 @@ const images = [
     units: '12 (1 bedroom)',
     location: 'Canggu, Bali',
     available: false,
+    slug: "canggu-residence",
   },
   {
     src: '/assets/images/2_bed_new.png',
@@ -31,6 +32,7 @@ const images = [
     units: '16 (1 bedroom)',
     location: 'Bingin, Bali',
     available: false,
+    slug: "bingin-residence",
   },
 ]
 
@@ -369,7 +371,7 @@ export default function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.55 }}
               >
                 <Link
-                  href="/map"
+                  href={`/map?location=${images[current].slug}`}
                   className="btn-primary"
                   transitionTypes={['nav-forward']}
                 >
