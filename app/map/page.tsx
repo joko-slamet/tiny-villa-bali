@@ -9,16 +9,16 @@ const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 const markers = [
   {
-    slug: 'villa-serenara',
-    name: 'Villa Serenara',
+    slug: 'canggu-residence',
+    name: 'Canggu Residence',
     desc: 'Our exclusive 5-bedroom private villa in Ubud',
     // position as % of image — adjust x/y to match actual map
     x: 46,
     y: 36,
   },
   {
-    slug: 'ngurah-rai',
-    name: 'Ngurah Rai Airport',
+    slug: 'binging-residence',
+    name: 'Binging Residence',
     desc: '45 min drive from the villa',
     x: 54,
     y: 48,
