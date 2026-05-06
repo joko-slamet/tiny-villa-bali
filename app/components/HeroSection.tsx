@@ -37,9 +37,9 @@ const images = [
 ]
 
 const sweepVariants = {
-  enter: (dir: number) => ({ rotateY: dir > 0 ? 80 : -80, opacity: 0 }),
-  center: { rotateY: 0, opacity: 1 },
-  exit:   (dir: number) => ({ rotateY: dir > 0 ? -80 : 80, opacity: 0 }),
+  enter: (dir: number) => ({ rotateY: dir > 0 ? -75 : 75, rotateX: dir > 0 ? -22 : 22, y: dir > 0 ? -60 : 60, opacity: 0 }),
+  center: { rotateY: 0, rotateX: 0, y: 0, opacity: 1 },
+  exit:   (dir: number) => ({ rotateY: dir > 0 ? 75 : -75, rotateX: dir > 0 ? 22 : -22, y: dir > 0 ? 60 : -60, opacity: 0 }),
 }
 
 
@@ -260,7 +260,7 @@ export default function HeroSection() {
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 28,
-                  transformOrigin: 'center center 900px',
+                  transformOrigin: 'center center 2000px',
                 }}
               >
                 <div
