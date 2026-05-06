@@ -12,8 +12,26 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const images = [
-  { src: '/assets/images/1_bed_new.png', alt: 'Bedroom 1', bg: '#cec4b1' },
-  { src: '/assets/images/2_bed_new.png', alt: 'Bedroom 2', bg: '#cebeaf' },
+  {
+    src: '/assets/images/1_bed_new.png',
+    alt: 'Bedroom 1',
+    bg: '#cec4b1',
+    name: 'Canggu Residence',
+    status: 'Completed',
+    units: '12 (1 bedroom)',
+    location: 'Canggu, Bali',
+    available: false,
+  },
+  {
+    src: '/assets/images/2_bed_new.png',
+    alt: 'Bedroom 2',
+    bg: '#cebeaf',
+    name: 'Bingin Residence',
+    status: 'Completed',
+    units: '16 (1 bedroom)',
+    location: 'Bingin, Bali',
+    available: false,
+  },
 ]
 
 const sweepVariants = {
@@ -21,6 +39,7 @@ const sweepVariants = {
   center: { rotateY: 0 },
   exit:   (dir: number) => ({ rotateY: dir > 0 ? -80 : 80 }),
 }
+
 
 const MIN_ZOOM = 1
 const MAX_ZOOM = 5
@@ -36,17 +55,14 @@ export default function HeroSection() {
   const [current, setCurrent]     = useState(0)
   const [direction, setDirection] = useState(1)
 
-  // Zoom / pan — stored in refs to avoid stale closures in wheel handler
   const zoomRef = useRef(1)
   const panRef  = useRef({ x: 0, y: 0 })
   const [transform, setTransform] = useState({ zoom: 1, x: 0, y: 0 })
 
-  // Drag-to-pan
   const isDragging  = useRef(false)
   const dragStart   = useRef({ mx: 0, my: 0, px: 0, py: 0 })
   const [dragging, setDragging] = useState(false)
 
-  // Tilt
   const mx  = useMotionValue(0)
   const my  = useMotionValue(0)
   const smx = useSpring(mx, { stiffness: 60, damping: 18 })
@@ -55,7 +71,7 @@ export default function HeroSection() {
   const tiltX = useTransform(smy, [-1, 1], [4, -4])
 
   function handleTiltMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (zoomRef.current > 1) return  // disable tilt when zoomed
+    if (zoomRef.current > 1) return
     const rect = tiltRef.current?.getBoundingClientRect()
     if (!rect) return
     mx.set((e.clientX - rect.left) / rect.width * 2 - 1)
@@ -64,7 +80,6 @@ export default function HeroSection() {
 
   function handleTiltLeave() { mx.set(0); my.set(0) }
 
-  // Non-passive wheel event for zoom at cursor
   useEffect(() => {
     const el = imageContainerRef.current
     if (!el) return
@@ -82,11 +97,9 @@ export default function HeroSection() {
       const W = rect.width
       const H = rect.height
 
-      // Keep cursor point fixed during zoom
       let newX = cx - newZoom * (cx - panRef.current.x) / oldZoom
       let newY = cy - newZoom * (cy - panRef.current.y) / oldZoom
 
-      // Clamp pan so image never exposes background
       newX = clamp(newX, -(newZoom - 1) * W, 0)
       newY = clamp(newY, -(newZoom - 1) * H, 0)
 
@@ -99,7 +112,6 @@ export default function HeroSection() {
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
-  // Drag-to-pan handlers
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (zoomRef.current <= 1) return
     isDragging.current = true
@@ -134,7 +146,6 @@ export default function HeroSection() {
     setDragging(false)
   }, [])
 
-  // Double-click to reset
   const handleDoubleClick = useCallback(() => {
     zoomRef.current = 1
     panRef.current  = { x: 0, y: 0 }
@@ -144,12 +155,20 @@ export default function HeroSection() {
   function navigate(dir: number) {
     const next = current + dir
     if (next < 0 || next >= images.length) return
-    // Reset zoom on navigate
     zoomRef.current = 1
     panRef.current  = { x: 0, y: 0 }
     setTransform({ zoom: 1, x: 0, y: 0 })
     setDirection(dir)
     setCurrent(next)
+  }
+
+  function goTo(i: number) {
+    if (i === current) return
+    zoomRef.current = 1
+    panRef.current  = { x: 0, y: 0 }
+    setTransform({ zoom: 1, x: 0, y: 0 })
+    setDirection(i > current ? 1 : -1)
+    setCurrent(i)
   }
 
   const isZoomed = transform.zoom > 1
@@ -182,7 +201,6 @@ export default function HeroSection() {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        // overflow: 'hidden',
       }}
     >
       <div className="orb orb-1" style={{ opacity: 0.45 }} />
@@ -192,15 +210,15 @@ export default function HeroSection() {
         ref={tiltRef}
         onMouseMove={handleTiltMove}
         onMouseLeave={handleTiltLeave}
-        style={{ width: '100%', maxWidth: 1200, position: 'relative', zIndex: 1 }}
+        style={{ width: '100%', maxWidth: 1200, position: 'relative', zIndex: 1, padding: '0 16px' }}
       >
+        {/* Image carousel */}
         <motion.div
           initial={{ opacity: 0, y: 48, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           style={{ rotateX: tiltX, rotateY: tiltY }}
         >
-          {/* Image carousel + zoom container */}
           <div
             ref={imageContainerRef}
             onPointerDown={handlePointerDown}
@@ -230,11 +248,9 @@ export default function HeroSection() {
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 28,
-                  // overflow: 'hidden',
                   transformOrigin: 'center center 900px',
                 }}
               >
-                {/* Zoom/pan layer */}
                 <div
                   style={{
                     position: 'absolute',
@@ -258,7 +274,7 @@ export default function HeroSection() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Zoom level badge */}
+            {/* Zoom badge */}
             <AnimatePresence>
               {isZoomed && (
                 <motion.div
@@ -289,21 +305,103 @@ export default function HeroSection() {
           </div>
         </motion.div>
 
-        {/* Button below image */}
+        {/* ── Decorative info strip ── */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          style={{ marginTop: 20 }}
         >
-          <Link href="/map" className="btn-primary" transitionTypes={['nav-forward']}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-              <line x1="9" y1="3" x2="9" y2="18"/>
-              <line x1="15" y1="6" x2="15" y2="21"/>
-            </svg>
-            View Location
-          </Link>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'start', gap: 24 }}>
+
+            {/* Left — metadata */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`meta-${current}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
+              >
+                <span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'rgba(28,21,16,0.4)', letterSpacing: '0.3px' }}>
+                  {images[current].location}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.68rem', color: 'rgba(28,21,16,0.35)', fontWeight: 500 }}>
+                  <span>{images[current].status}</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span>{images[current].units}</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span style={{ color: images[current].available ? '#059669' : 'rgba(28,21,16,0.35)' }}>
+                    {images[current].available ? 'Available' : 'Not Available'}
+                  </span>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Center — title + button */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+              <AnimatePresence mode="wait">
+                <motion.h2
+                  key={`title-${current}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                  style={{
+                    fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
+                    fontWeight: 800,
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                    color: 'var(--text)',
+                    margin: 0,
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {images[current].name}
+                </motion.h2>
+              </AnimatePresence>
+
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.55 }}
+              >
+                <Link
+                  href="/map"
+                  className="btn-primary"
+                  transitionTypes={['nav-forward']}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    <line x1="9" y1="3" x2="9" y2="18"/>
+                    <line x1="15" y1="6" x2="15" y2="21"/>
+                  </svg>
+                  View Location
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Right — slide dots */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', paddingTop: 4 }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                {images.map((_, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => goTo(i)}
+                    animate={{
+                      width: i === current ? 24 : 6,
+                      background: i === current ? 'rgba(28,21,16,0.5)' : 'rgba(28,21,16,0.18)',
+                    }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ height: 4, borderRadius: 99, border: 'none', cursor: 'pointer', padding: 0 }}
+                  />
+                ))}
+              </div>
+            </div>
+
+          </div>
         </motion.div>
       </div>
 
