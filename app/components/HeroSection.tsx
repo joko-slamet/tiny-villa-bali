@@ -37,9 +37,9 @@ const images = [
 ]
 
 const sweepVariants = {
-  enter: (dir: number) => ({ rotateY: dir > 0 ? 80 : -80 }),
-  center: { rotateY: 0 },
-  exit:   (dir: number) => ({ rotateY: dir > 0 ? -80 : 80 }),
+  enter: (dir: number) => ({ rotateY: dir > 0 ? 80 : -80, opacity: 0 }),
+  center: { rotateY: 0, opacity: 1 },
+  exit:   (dir: number) => ({ rotateY: dir > 0 ? -80 : 80, opacity: 0 }),
 }
 
 
@@ -157,6 +157,12 @@ export default function HeroSection() {
   function navigate(dir: number) {
     const next = current + dir
     if (next < 0 || next >= images.length) return
+
+    // Play click sound
+    const audio = new Audio('/assets/audio/click.wav')
+    audio.volume = 0.5
+    audio.play().catch(() => {})
+
     zoomRef.current = 1
     panRef.current  = { x: 0, y: 0 }
     setTransform({ zoom: 1, x: 0, y: 0 })
@@ -196,7 +202,7 @@ export default function HeroSection() {
   return (
     <motion.section
       animate={{ backgroundColor: images[current].bg }}
-      transition={{ duration: 0.65, ease: 'easeInOut' }}
+      transition={{ duration: 1.2, ease: 'easeInOut' }}
       style={{
         minHeight: 'calc(100vh - var(--nav-h))',
         display: 'flex',
@@ -218,7 +224,7 @@ export default function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 48, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
           style={{ rotateX: tiltX, rotateY: tiltY }}
         >
           <div
@@ -245,7 +251,11 @@ export default function HeroSection() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ 
+                  duration: 1.4, 
+                  ease: [0.4, 0, 0.2, 1],
+                  opacity: { duration: 1.4, ease: "easeInOut" }
+                }}
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -323,7 +333,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
                 style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
               >
                 <span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'rgba(28,21,16,0.4)', letterSpacing: '0.3px' }}>
@@ -349,7 +359,7 @@ export default function HeroSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
                   style={{
                     fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
                     fontWeight: 800,
@@ -396,7 +406,7 @@ export default function HeroSection() {
                       width: i === current ? 24 : 6,
                       background: i === current ? 'rgba(28,21,16,0.5)' : 'rgba(28,21,16,0.18)',
                     }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     style={{ height: 4, borderRadius: 99, border: 'none', cursor: 'pointer', padding: 0 }}
                   />
                 ))}
