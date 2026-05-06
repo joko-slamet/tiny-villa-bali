@@ -95,15 +95,25 @@ export default function HeroSection() {
   const tiltY = useTransform(smx, [-1, 1], [-6, 6])
   const tiltX = useTransform(smy, [-1, 1], [4, -4])
 
+  const [isHovered, setIsHovered] = useState(false)
+  
+  const imgParallaxX = useTransform(smx, [-1, 1], [15, -15])
+  const imgParallaxY = useTransform(smy, [-1, 1], [15, -15])
+
   function handleTiltMove(e: React.MouseEvent<HTMLDivElement>) {
     if (zoomRef.current > 1) return
+    setIsHovered(true)
     const rect = tiltRef.current?.getBoundingClientRect()
     if (!rect) return
     mx.set((e.clientX - rect.left) / rect.width * 2 - 1)
     my.set((e.clientY - rect.top)  / rect.height * 2 - 1)
   }
 
-  function handleTiltLeave() { mx.set(0); my.set(0) }
+  function handleTiltLeave() { 
+    mx.set(0)
+    my.set(0)
+    setIsHovered(false)
+  }
 
   useEffect(() => {
     const el = imageContainerRef.current
@@ -290,6 +300,7 @@ export default function HeroSection() {
                   inset: 0,
                   borderRadius: 28,
                   transformOrigin: 'center center 2000px',
+                  overflow: 'visible',
                 }}
               >
                 <div
@@ -304,13 +315,22 @@ export default function HeroSection() {
                     willChange: 'transform',
                   }}
                 >
-                  <Image
-                    src={images[current].src}
-                    alt={images[current].alt}
-                    fill
-                    style={{ objectFit: 'cover', pointerEvents: 'none' }}
-                    priority
-                  />
+                  <motion.div
+                    style={{
+                      position: 'absolute',
+                      inset: -40,
+                      x: imgParallaxX,
+                      y: imgParallaxY,
+                    }}
+                  >
+                    <Image
+                      src={images[current].src}
+                      alt={images[current].alt}
+                      fill
+                      style={{ objectFit: 'cover', pointerEvents: 'none' }}
+                      priority
+                    />
+                  </motion.div>
                 </div>
               </motion.div>
             </AnimatePresence>
