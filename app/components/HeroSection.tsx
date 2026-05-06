@@ -192,7 +192,7 @@ export default function HeroSection() {
         ref={tiltRef}
         onMouseMove={handleTiltMove}
         onMouseLeave={handleTiltLeave}
-        style={{ width: '100%', maxWidth: 780, position: 'relative', zIndex: 1 }}
+        style={{ width: '100%', maxWidth: 1200, position: 'relative', zIndex: 1 }}
       >
         <motion.div
           initial={{ opacity: 0, y: 48, scale: 0.94 }}
