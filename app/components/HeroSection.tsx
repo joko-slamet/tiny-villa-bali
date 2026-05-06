@@ -263,7 +263,7 @@ export default function HeroSection() {
         ref={tiltRef}
         onMouseMove={handleTiltMove}
         onMouseLeave={handleTiltLeave}
-        style={{ width: '100%', maxWidth: 1200, position: 'relative', zIndex: 1, padding: '0 16px' }}
+        style={{ width: '100%', maxWidth: 1000, position: 'relative', zIndex: 1, padding: '0 16px' }}
       >
         {/* Image carousel */}
         <motion.div
@@ -423,6 +423,8 @@ export default function HeroSection() {
 
 
 
+
+
         {/* ── Title strip at bottom ── */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -531,7 +533,8 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Left arrow */}
+
+      {/* Left arrow (Asymmetrical Center-Anchored) */}
       <AnimatePresence>
         {current > 0 && (
           <motion.button
@@ -541,24 +544,33 @@ export default function HeroSection() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.5 }}
             onClick={() => navigate(-1)}
-            style={{ ...navBtnBase, left: 24 }}
+            style={{ 
+              ...navBtnBase, 
+              left: 24, 
+              bottom: '50%', 
+              top: 'auto',
+              transform: 'none', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center' 
+            }}
             className="group"
           >
             <motion.span 
-              style={verticalLabelStyle}
+              style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
               whileHover={{ opacity: 1, color: '#000' }}
             >
               {images[current - 1].name}
             </motion.span>
-            <div style={{ width: 2, height: 60, background: 'rgba(28,21,16,0.35)' }} />
+            <div style={{ width: 1, height: 60, background: 'rgba(28,21,16,0.1)', margin: '12px 0' }} />
             <motion.div
-              whileHover={{ scale: 1.15, y: -8, background: 'rgba(28,21,16,0.08)' }}
+              whileHover={{ scale: 1.1, background: 'rgba(28,21,16,0.05)' }}
               style={{
-                width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(28,21,16,0.3)',
+                width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </motion.div>
@@ -566,7 +578,7 @@ export default function HeroSection() {
         )}
       </AnimatePresence>
 
-      {/* Right arrow */}
+      {/* Right arrow (Asymmetrical Center-Anchored) */}
       <AnimatePresence>
         {current < images.length - 1 && (
           <motion.button
@@ -576,23 +588,31 @@ export default function HeroSection() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.5 }}
             onClick={() => navigate(1)}
-            style={{ ...navBtnBase, right: 24 }}
+            style={{ 
+              ...navBtnBase, 
+              right: 24, 
+              top: '50%', 
+              transform: 'none', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center' 
+            }}
             className="group"
           >
             <motion.div
-              whileHover={{ scale: 1.15, y: 8, background: 'rgba(28,21,16,0.08)' }}
+              whileHover={{ scale: 1.1, background: 'rgba(28,21,16,0.05)' }}
               style={{
-                width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(28,21,16,0.3)',
+                width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </motion.div>
-            <div style={{ width: 2, height: 60, background: 'rgba(28,21,16,0.35)' }} />
+            <div style={{ width: 1, height: 60, background: 'rgba(28,21,16,0.1)', margin: '12px 0' }} />
             <motion.span 
-              style={{ ...verticalLabelStyle, transform: 'none', writingMode: 'vertical-rl' }}
+              style={{ ...verticalLabelStyle, writingMode: 'vertical-rl' }}
               whileHover={{ opacity: 1, color: '#000' }}
             >
               {images[current + 1].name}
