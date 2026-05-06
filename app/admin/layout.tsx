@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   else if (pathname.includes('/admin/edit/map')) activeTab = 'map';
 
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - var(--nav-h, 72px))', width: '100%', backgroundColor: 'var(--bg)' }}>
+    <div style={{ display: 'flex', height: 'calc(100vh - var(--nav-h, 72px))', width: '100%', backgroundColor: 'var(--bg)', overflow: 'hidden' }}>
       {/* Sidebar */}
       <aside style={{ width: '280px', backgroundColor: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(10px)', borderRight: '1px solid var(--border)', padding: '32px 24px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ marginBottom: '48px', paddingLeft: '12px' }}>
