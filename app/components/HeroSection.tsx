@@ -7,6 +7,7 @@ import {
   useSpring,
   useTransform,
   AnimatePresence,
+  Variants,
 } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -36,10 +37,24 @@ const images = [
   },
 ]
 
-const sweepVariants = {
+const sweepVariants: Variants = {
   enter: (dir: number) => ({ rotateY: dir > 0 ? -75 : 75, rotateX: dir > 0 ? -22 : 22, y: dir > 0 ? -60 : 60, opacity: 0 }),
-  center: { rotateY: 0, rotateX: 0, y: 0, opacity: 1 },
-  exit:   (dir: number) => ({ rotateY: dir > 0 ? 75 : -75, rotateX: dir > 0 ? 22 : -22, y: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { 
+    rotateY: 0, rotateX: 0, y: 0, opacity: 1,
+    transition: {
+      duration: 2.2,
+      ease: [0.4, 0, 0.2, 1],
+      opacity: { delay: 1.0, duration: 1.2, ease: "easeInOut" }
+    }
+  },
+  exit: (dir: number) => ({ 
+    rotateY: dir > 0 ? 75 : -75, rotateX: dir > 0 ? 22 : -22, y: dir > 0 ? 60 : -60, opacity: 0,
+    transition: {
+      duration: 2.2,
+      ease: [0.4, 0, 0.2, 1],
+      opacity: { duration: 1.0, ease: "easeInOut" }
+    }
+  }),
 }
 
 
@@ -64,6 +79,14 @@ export default function HeroSection() {
   const isDragging  = useRef(false)
   const dragStart   = useRef({ mx: 0, my: 0, px: 0, py: 0 })
   const [dragging, setDragging] = useState(false)
+
+  const clickSound = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    clickSound.current = new Audio('/assets/audio/click.wav')
+    clickSound.current.volume = 0.5
+    clickSound.current.load()
+  }, [])
 
   const mx  = useMotionValue(0)
   const my  = useMotionValue(0)
@@ -159,9 +182,10 @@ export default function HeroSection() {
     if (next < 0 || next >= images.length) return
 
     // Play click sound
-    const audio = new Audio('/assets/audio/click.wav')
-    audio.volume = 0.5
-    audio.play().catch(() => {})
+    if (clickSound.current) {
+      clickSound.current.currentTime = 0
+      clickSound.current.play().catch(() => {})
+    }
 
     zoomRef.current = 1
     panRef.current  = { x: 0, y: 0 }
@@ -181,28 +205,37 @@ export default function HeroSection() {
 
   const isZoomed = transform.zoom > 1
 
-  const arrowBase: React.CSSProperties = {
+  const navBtnBase: React.CSSProperties = {
     position: 'absolute',
     top: '50%',
     transform: 'translateY(-50%)',
-    width: 48,
-    height: 48,
-    borderRadius: '50%',
-    border: '1px solid rgba(255,255,255,0.35)',
-    background: 'rgba(255,255,255,0.18)',
-    backdropFilter: 'blur(10px)',
-    cursor: 'pointer',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    color: '#1c1510',
+    gap: 20,
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    color: 'rgba(28,21,16,0.85)',
     zIndex: 10,
+    padding: '20px 10px',
+  }
+
+  const verticalLabelStyle: React.CSSProperties = {
+    writingMode: 'vertical-rl',
+    transform: 'rotate(180deg)',
+    fontSize: '0.8rem',
+    fontWeight: 800,
+    letterSpacing: '4px',
+    textTransform: 'uppercase',
+    opacity: 0.8,
+    whiteSpace: 'nowrap',
   }
 
   return (
     <motion.section
       animate={{ backgroundColor: images[current].bg }}
-      transition={{ duration: 1.2, ease: 'easeInOut' }}
+      transition={{ duration: 1.8, ease: 'easeInOut' }}
       style={{
         minHeight: 'calc(100vh - var(--nav-h))',
         display: 'flex',
@@ -251,11 +284,7 @@ export default function HeroSection() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ 
-                  duration: 1.4, 
-                  ease: [0.4, 0, 0.2, 1],
-                  opacity: { duration: 1.4, ease: "easeInOut" }
-                }}
+                transition={{ duration: 2.2 }}
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -333,7 +362,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 1.2, ease: "easeInOut" }}
+                transition={{ duration: 1.4, ease: "easeInOut" }}
                 style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
               >
                 <span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'rgba(28,21,16,0.4)', letterSpacing: '0.3px' }}>
@@ -359,7 +388,7 @@ export default function HeroSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                  transition={{ duration: 1.4, ease: "easeInOut" }}
                   style={{
                     fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
                     fontWeight: 800,
@@ -406,7 +435,7 @@ export default function HeroSection() {
                       width: i === current ? 24 : 6,
                       background: i === current ? 'rgba(28,21,16,0.5)' : 'rgba(28,21,16,0.18)',
                     }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     style={{ height: 4, borderRadius: 99, border: 'none', cursor: 'pointer', padding: 0 }}
                   />
                 ))}
@@ -420,19 +449,33 @@ export default function HeroSection() {
       <AnimatePresence>
         {current > 0 && (
           <motion.button
-            key="left"
-            initial={{ opacity: 0, x: -16 }}
+            key={`nav-left-${current}`}
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5 }}
             onClick={() => navigate(-1)}
-            style={{ ...arrowBase, left: 16 }}
-            whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.32)' }}
-            whileTap={{ scale: 0.95 }}
+            style={{ ...navBtnBase, left: 24 }}
+            className="group"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
+            <motion.span 
+              style={verticalLabelStyle}
+              whileHover={{ opacity: 1, color: '#000' }}
+            >
+              {images[current - 1].name}
+            </motion.span>
+            <div style={{ width: 2, height: 60, background: 'rgba(28,21,16,0.35)' }} />
+            <motion.div
+              whileHover={{ scale: 1.15, y: -8, background: 'rgba(28,21,16,0.08)' }}
+              style={{
+                width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(28,21,16,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </motion.div>
           </motion.button>
         )}
       </AnimatePresence>
@@ -441,19 +484,33 @@ export default function HeroSection() {
       <AnimatePresence>
         {current < images.length - 1 && (
           <motion.button
-            key="right"
-            initial={{ opacity: 0, x: 16 }}
+            key={`nav-right-${current}`}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 16 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.5 }}
             onClick={() => navigate(1)}
-            style={{ ...arrowBase, right: 16 }}
-            whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.32)' }}
-            whileTap={{ scale: 0.95 }}
+            style={{ ...navBtnBase, right: 24 }}
+            className="group"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
+            <motion.div
+              whileHover={{ scale: 1.15, y: 8, background: 'rgba(28,21,16,0.08)' }}
+              style={{
+                width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(28,21,16,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </motion.div>
+            <div style={{ width: 2, height: 60, background: 'rgba(28,21,16,0.35)' }} />
+            <motion.span 
+              style={{ ...verticalLabelStyle, transform: 'none', writingMode: 'vertical-rl' }}
+              whileHover={{ opacity: 1, color: '#000' }}
+            >
+              {images[current + 1].name}
+            </motion.span>
           </motion.button>
         )}
       </AnimatePresence>
