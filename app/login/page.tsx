@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,26 +15,21 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    if (localStorage.getItem('isAuthenticated') === 'true') {
-      router.push('/admin/edit/home');
-    }
-  }, [router]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      if (email === "mbuchacher2@example.com" && password === "password123") {
-        localStorage.setItem('isAuthenticated', 'true');
-        router.push("/admin/edit/home");
-      } else {
-        setError("Invalid email or password");
-      }
-    }, 1000);
+
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
+    setIsLoading(false);
+    if (authError) {
+      setError(authError.message);
+    } else {
+      router.push("/admin/edit/home");
+      router.refresh();
+    }
   };
 
   return (

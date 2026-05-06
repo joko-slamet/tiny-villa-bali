@@ -1,39 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { 
-  LayoutDashboard, 
-  Image as ImageIcon, 
-  Home, 
+import React from "react";
+import {
+  Image as ImageIcon,
+  Home,
   Phone,
   MapPin,
-  LogOut 
+  LogOut
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuth, setIsAuth] = useState(false);
 
-  useEffect(() => {
-    if (localStorage.getItem('isAuthenticated') !== 'true') {
-      router.push('/login');
-    } else {
-      setIsAuth(true);
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push("/login");
+    router.refresh();
   };
 
-  if (!isAuth) return null; // Prevent UI flash before redirect
-
-  // Determine active tab based on path.
-  let activeTab = 'dashboard'; 
+  let activeTab = 'dashboard';
   if (pathname.includes('/admin/edit/home')) activeTab = 'home';
   else if (pathname.includes('/admin/edit/projects')) activeTab = 'projects';
   else if (pathname.includes('/admin/edit/contact')) activeTab = 'contact';
