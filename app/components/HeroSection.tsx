@@ -562,7 +562,6 @@ export default function HeroSection() {
             >
               {images[current - 1].name}
             </motion.span>
-            <div style={{ width: 1, height: 60, background: 'rgba(28,21,16,0.1)', margin: '12px 0' }} />
             <motion.div
               whileHover={{ scale: 1.1, background: 'rgba(28,21,16,0.05)' }}
               style={{
@@ -610,7 +609,6 @@ export default function HeroSection() {
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </motion.div>
-            <div style={{ width: 1, height: 60, background: 'rgba(28,21,16,0.1)', margin: '12px 0' }} />
             <motion.span 
               style={{ ...verticalLabelStyle, writingMode: 'vertical-rl' }}
               whileHover={{ opacity: 1, color: '#000' }}
