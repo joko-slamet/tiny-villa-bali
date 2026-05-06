@@ -26,6 +26,8 @@ const details: Record<
     images: string[];
     view360a?: string;
     view360b?: string;
+    cover360a?: string;
+    cover360b?: string;
   }
 > = {
   "canggu-residence": {
@@ -57,15 +59,17 @@ const details: Record<
     details2:
       "Designed as a compact retreat, the villa connects you instantly with nature. Enjoy your morning coffee by the private plunge pool, feeling the warmth and peace of a true second home.",
     images: [
-      "/assets/images/binging/bingin-pool.png",
-      "/assets/images/binging/bingin-living-room.png",
+      "/assets/images/binging/bingin-parking.png",
       "/assets/images/binging/bingin-bedroom.png",
       "/assets/images/binging/bingin-kitchen.png",
+      "/assets/images/binging/bingin-living-room.png",
       "/assets/images/binging/bingin-bathroom.png",
-      "/assets/images/binging/bingin-parking.png",
+      "/assets/images/binging/bingin-pool.png",
     ],
     view360a: "https://ccs.viewin360.co/Bingin",
-    view360b: "https://ccs.viewin360.co/bingin2"
+    view360b: "https://ccs.viewin360.co/bingin2",
+    cover360a: "/assets/images/binging/cover-360a.png",
+    cover360b: "/assets/images/binging/cover-360b.png",
   },
 };
 
@@ -188,12 +192,12 @@ function TiltCard({ src, alt, onClick }: { src: string; alt: string; featured?: 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => { setHovered(false); setTilt({ x: 0, y: 0 }); }}
       onClick={onClick}
-      style={{ perspective: "900px", cursor: onClick ? "pointer" : "default", height: "100%", width: "100%" }}
+      style={{ perspective: "900px", cursor: onClick ? "pointer" : "default", height: "100%", width: "100%", overflow: "hidden" }}
     >
       <motion.div
-        animate={{ rotateX: tilt.x, rotateY: tilt.y, scale: hovered ? 1.03 : 1 }}
+        animate={{ rotateX: tilt.x, rotateY: tilt.y, scale: hovered ? 1.06 : 1 }}
         transition={{ type: "spring", stiffness: 280, damping: 28 }}
-        style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", borderRadius: 16, overflow: "hidden" }}
+        style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d" }}
       >
         <Image src={src} alt={alt} fill style={{ objectFit: "cover" }} />
 
@@ -345,128 +349,105 @@ export default function LocationDetailPage({ params }: { params: Promise<{ locat
 
       {/* 2. Image gallery */}
       {hasMultipleImages && (
-        <section style={{ padding: "clamp(64px, 8vh, 96px) clamp(24px, 5vw, 64px)" }}>
-          <Reveal>
-            <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "4px", textTransform: "uppercase", color: "var(--muted-2)", marginBottom: 24 }}>
-              Gallery
-            </p>
-          </Reveal>
+        <section style={{ padding: "clamp(48px, 6vh, 72px) clamp(24px, 5vw, 64px)" }}>
+          <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
 
-          {/* Grid: 1 large + 2 tall on right, then 3 below */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "320px 220px", gap: 12 }}>
-            {/* Featured */}
-            <div style={{ gridRow: "1 / 3", gridColumn: "1 / 2" }}>
-              <TiltCard src={detail.images[0]} alt={detail.name} featured onClick={() => setLightboxIndex(0)} />
+            <Reveal>
+              <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "4px", textTransform: "uppercase", color: "var(--muted-2)", marginBottom: 14 }}>
+                Gallery
+              </p>
+            </Reveal>
+
+            {/* Row 1 — 3 landscape */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {detail.images.slice(0, 3).map((src, i) => (
+                <Reveal key={i} delay={i * 0.06}>
+                  <div style={{ width: "100%", aspectRatio: "4/3", borderRadius: 12, overflow: "hidden" }}>
+                    <TiltCard src={src} alt={detail.name} onClick={() => setLightboxIndex(i)} />
+                  </div>
+                </Reveal>
+              ))}
             </div>
-            {detail.images.slice(1, 3).map((src, i) => (
-              <div key={i} style={{ gridColumn: `${i + 2} / ${i + 3}`, gridRow: "1 / 2" }}>
-                <TiltCard src={src} alt={detail.name} onClick={() => setLightboxIndex(i + 1)} />
-              </div>
-            ))}
-            {detail.images.slice(3, 6).map((src, i) => (
-              <div key={i} style={{ gridRow: "2 / 3", gridColumn: `${i + 1} / ${i + 2}` }}>
-                <TiltCard src={src} alt={detail.name} onClick={() => setLightboxIndex(i + 3)} />
-              </div>
-            ))}
+
+            {/* Row 2 — 3 portrait */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {detail.images.slice(3, 6).map((src, i) => (
+                <Reveal key={i} delay={i * 0.06}>
+                  <div style={{ width: "100%", aspectRatio: "3/4", borderRadius: 12, overflow: "hidden" }}>
+                    <TiltCard src={src} alt={detail.name} onClick={() => setLightboxIndex(i + 3)} />
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
           </div>
         </section>
       )}
 
       {/* 3. 360° Virtual Tour */}
       {(detail.view360a || detail.view360b) && (
-        <section style={{ padding: "0 clamp(24px, 5vw, 64px) clamp(64px, 8vh, 96px)" }}>
+        <section style={{ padding: "0 clamp(24px, 5vw, 64px) clamp(48px, 6vh, 72px)" }}>
+          <div style={{ maxWidth: 860, margin: "0 auto" }}>
           <Reveal>
-            <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "4px", textTransform: "uppercase", color: "var(--muted-2)", marginBottom: 24 }}>
+            <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "4px", textTransform: "uppercase", color: "var(--muted-2)", marginBottom: 14 }}>
               360° Virtual Tour
             </p>
           </Reveal>
 
-          <div style={{ display: "grid", gridTemplateColumns: detail.view360a && detail.view360b ? "1fr 1fr" : "1fr", gap: 12 }}>
-            {[detail.view360a, detail.view360b].filter(Boolean).map((url, i) => (
+          <div style={{ display: "grid", gridTemplateColumns: detail.view360a && detail.view360b ? "1fr 1fr" : "1fr", gap: 8 }}>
+            {([
+              { url: detail.view360a, cover: detail.cover360a },
+              { url: detail.view360b, cover: detail.cover360b },
+            ] as { url?: string; cover?: string }[])
+              .filter(({ url }) => Boolean(url))
+              .map(({ url, cover }, i) => (
               <Reveal key={i} delay={i * 0.06}>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ textDecoration: "none", display: "block" }}
-                >
+                <a href={url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>
                   <motion.div
-                    whileHover={{ scale: 1.015 }}
+                    whileHover="hovered"
                     whileTap={{ scale: 0.99 }}
                     transition={{ type: "spring", stiffness: 300, damping: 28 }}
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      aspectRatio: "16/9",
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      background: "var(--surface)",
-                      border: "1px solid var(--border)",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 20,
-                      cursor: "pointer",
-                    }}
+                    style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: 12, overflow: "hidden", cursor: "pointer" }}
                   >
-                    {/* Decorative rings */}
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-                      {[180, 260, 340].map((size, j) => (
-                        <div key={j} style={{
-                          position: "absolute",
-                          width: size, height: size,
-                          borderRadius: "50%",
-                          border: "1px solid var(--border)",
-                          opacity: 0.5 - j * 0.12,
-                        }} />
-                      ))}
-                    </div>
+                    {/* Cover image */}
+                    {cover && (
+                      <Image src={cover} alt={`Virtual Tour ${i + 1}`} fill style={{ objectFit: "cover" }} />
+                    )}
 
-                    {/* 360 icon */}
-                    <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-                      <div style={{
-                        width: 72, height: 72, borderRadius: "50%",
-                        background: "var(--accent-1)", opacity: 0.9,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        boxShadow: "0 8px 32px rgba(184,146,42,0.3)",
-                      }}>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
-                          <path d="M12 2c-2.8 4-4 6.7-4 10s1.2 6 4 10"/>
-                          <path d="M12 2c2.8 4 4 6.7 4 10s-1.2 6-4 10"/>
-                          <path d="M2 12h20"/>
+                    {/* Gradient overlay — deepens on hover */}
+                    <motion.div
+                      variants={{ hovered: { opacity: 1 }, initial: { opacity: 0.55 } }}
+                      initial="initial"
+                      style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }}
+                    />
+
+                    {/* Play button — scales up on hover */}
+                    <motion.div
+                      variants={{ hovered: { scale: 1.12 }, initial: { scale: 1 } }}
+                      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                      style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}
+                    >
+                      <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                          <polygon points="6,3 20,12 6,21" />
                         </svg>
                       </div>
+                    </motion.div>
 
-                      <div style={{ textAlign: "center" }}>
-                        <p style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", margin: 0, letterSpacing: "0.5px" }}>
-                          Virtual Tour {i + 1}
-                        </p>
-                        <p style={{ fontSize: "0.72rem", color: "var(--muted-2)", margin: "4px 0 0", letterSpacing: "0.3px" }}>
-                          Opens in new tab
-                        </p>
-                      </div>
-
-                      <div style={{
-                        display: "inline-flex", alignItems: "center", gap: 6,
-                        fontSize: "0.7rem", fontWeight: 700, letterSpacing: "1.5px",
-                        textTransform: "uppercase", color: "var(--accent-1)",
-                        border: "1px solid var(--accent-1)", borderRadius: 99,
-                        padding: "6px 16px", opacity: 0.85,
-                      }}>
-                        Explore 360°
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                          <polyline points="15 3 21 3 21 9"/>
-                          <line x1="10" y1="14" x2="21" y2="3"/>
-                        </svg>
-                      </div>
+                    {/* Label bottom-left */}
+                    <div style={{ position: "absolute", bottom: 14, left: 16, right: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#fff", letterSpacing: "0.5px" }}>
+                        Virtual Tour {i + 1}
+                      </span>
+                      <span style={{ fontSize: "0.62rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>
+                        360°
+                      </span>
                     </div>
                   </motion.div>
                 </a>
               </Reveal>
             ))}
+          </div>
           </div>
         </section>
       )}
