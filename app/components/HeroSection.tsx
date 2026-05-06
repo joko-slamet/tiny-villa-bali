@@ -97,8 +97,10 @@ export default function HeroSection() {
 
   const [isHovered, setIsHovered] = useState(false)
   
-  const imgParallaxX = useTransform(smx, [-1, 1], [15, -15])
-  const imgParallaxY = useTransform(smy, [-1, 1], [15, -15])
+  const imgParallaxX = useTransform(smx, [-1, 1], [4, -4])
+  const imgParallaxY = useTransform(smy, [-1, 1], [4, -4])
+  const imgRotateY = useTransform(smx, [-1, 1], [-2, 2])
+  const imgRotateX = useTransform(smy, [-1, 1], [1.5, -1.5])
 
   function handleTiltMove(e: React.MouseEvent<HTMLDivElement>) {
     if (zoomRef.current > 1) return
@@ -318,9 +320,12 @@ export default function HeroSection() {
                   <motion.div
                     style={{
                       position: 'absolute',
-                      inset: -40,
+                      inset: -20, // Minimalist inset for a very subtle 'micro-interaction' feel
                       x: imgParallaxX,
                       y: imgParallaxY,
+                      rotateX: imgRotateX,
+                      rotateY: imgRotateY,
+                      transformStyle: 'preserve-3d',
                     }}
                   >
                     <Image
@@ -330,10 +335,102 @@ export default function HeroSection() {
                       style={{ objectFit: 'cover', pointerEvents: 'none' }}
                       priority
                     />
+
+                    {/* Image Overlay: Status & Availability */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={`status-overlay-${current}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 5 }}
+                        transition={{ duration: 1.2, ease: "easeInOut", delay: 1.0 }}
+                        style={{
+                          position: 'absolute',
+                          top: 32,
+                          right: 32,
+                          zIndex: 30,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 6,
+                          color: 'rgba(28,21,16,0.85)',
+                          padding: '14px 20px',
+                          background: 'rgba(255,255,255,0.35)',
+                          backdropFilter: 'blur(12px)',
+                          borderRadius: 20,
+                          border: '1px solid rgba(255,255,255,0.45)',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 2 }}>
+                          <span style={{ fontSize: '0.6rem', opacity: 0.6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                            Project Status
+                          </span>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px' }}>
+                            {images[current].status}
+                          </span>
+                        </div>
+                        <div style={{ width: '100%', height: 1, background: 'rgba(28,21,16,0.08)', margin: '4px 0' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ 
+                            width: 6, height: 6, borderRadius: '50%', 
+                            background: images[current].available ? '#059669' : '#64748b'
+                          }} />
+                          <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.8 }}>
+                            {images[current].available ? 'Available' : 'Not Available'}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
                   </motion.div>
                 </div>
               </motion.div>
             </AnimatePresence>
+          </div>
+        </motion.div>
+
+        {/* Top-Left: Metadata */}
+        <div style={{ position: 'absolute', top: 32, left: 32, zIndex: 50 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`meta-top-${current}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 1.4, ease: "easeInOut" }}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}
+            >
+              <div style={{ 
+                width: 36, height: 36, borderRadius: '50%', background: 'rgba(28,21,16,0.04)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(28,21,16,0.7)', marginBottom: 2 }}>
+                  {images[current].location}
+                </span>
+                <div style={{ display: 'flex', gap: 6, fontSize: '0.65rem', color: 'rgba(28,21,16,0.4)', fontWeight: 500 }}>
+                  <span style={{ opacity: 0.6 }}>Units :</span>
+                  <span>{images[current].units}</span>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+
+
+        {/* ── Title strip at bottom ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          style={{ marginTop: 48 }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
 
             {/* Zoom badge */}
             <AnimatePresence>
@@ -371,34 +468,11 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          style={{ marginTop: 20 }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'start', gap: 24 }}>
 
-            {/* Left — metadata */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`meta-${current}`}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 1.4, ease: "easeInOut" }}
-                style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
-              >
-                <span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'rgba(28,21,16,0.4)', letterSpacing: '0.3px' }}>
-                  {images[current].location}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.68rem', color: 'rgba(28,21,16,0.35)', fontWeight: 500 }}>
-                  <span>{images[current].status}</span>
-                  <span style={{ opacity: 0.4 }}>·</span>
-                  <span>{images[current].units}</span>
-                  <span style={{ opacity: 0.4 }}>·</span>
-                  <span style={{ color: images[current].available ? '#059669' : 'rgba(28,21,16,0.35)' }}>
-                    {images[current].available ? 'Available' : 'Not Available'}
-                  </span>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+            {/* Left — Empty now, metadata moved to overlay */}
+            <div />
 
             {/* Center — title + button */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
@@ -410,17 +484,27 @@ export default function HeroSection() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 1.4, ease: "easeInOut" }}
                   style={{
-                    fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
-                    fontWeight: 800,
-                    letterSpacing: '2px',
+                    fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+                    fontWeight: 200,
+                    letterSpacing: '14px',
                     textTransform: 'uppercase',
-                    color: 'var(--text)',
-                    margin: 0,
+                    color: 'rgba(28,21,16,0.9)',
+                    margin: '0 0 10px 0',
                     textAlign: 'center',
                     whiteSpace: 'nowrap',
+                    lineHeight: 1.1,
                   }}
                 >
-                  {images[current].name}
+                  {images[current].name.split('').map((char, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + i * 0.03, duration: 0.8 }}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
                 </motion.h2>
               </AnimatePresence>
 
@@ -442,24 +526,6 @@ export default function HeroSection() {
                   View Location
                 </Link>
               </motion.div>
-            </div>
-
-            {/* Right — slide dots */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', paddingTop: 4 }}>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                {images.map((_, i) => (
-                  <motion.button
-                    key={i}
-                    onClick={() => goTo(i)}
-                    animate={{
-                      width: i === current ? 24 : 6,
-                      background: i === current ? 'rgba(28,21,16,0.5)' : 'rgba(28,21,16,0.18)',
-                    }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ height: 4, borderRadius: 99, border: 'none', cursor: 'pointer', padding: 0 }}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </motion.div>
