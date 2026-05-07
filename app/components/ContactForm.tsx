@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { sendContactEmail } from '../contact/actions'
 
-type Status = 'idle' | 'sending' | 'sent'
+type Status = 'idle' | 'sending' | 'sent' | 'error'
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>('idle')
@@ -12,11 +13,15 @@ export default function ContactForm() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('sending')
-    await new Promise(r => setTimeout(r, 1400))
-    setStatus('sent')
+    try {
+      await sendContactEmail(form)
+      setStatus('sent')
+    } catch {
+      setStatus('error')
+    }
   }
 
   if (status === 'sent') {
@@ -62,6 +67,19 @@ export default function ContactForm() {
           gap: 20,
         }}
       >
+        {status === 'error' && (
+          <div style={{
+            background: 'rgba(220,38,38,0.06)',
+            border: '1px solid rgba(220,38,38,0.2)',
+            borderRadius: 10,
+            padding: '12px 16px',
+            fontSize: '0.85rem',
+            color: '#dc2626',
+          }}>
+            Something went wrong. Please try again or email us directly.
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div className="form-group">
             <label className="form-label" htmlFor="name">Full Name</label>
