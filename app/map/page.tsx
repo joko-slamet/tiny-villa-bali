@@ -1,32 +1,52 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
-const markers = [
-  {
-    slug: 'canggu-residence',
-    name: 'Canggu Residence',
-    desc: 'Our exclusive 5-bedroom private villa in Ubud',
-    // position as % of image — adjust x/y to match actual map
-    x: 46,
-    y: 36,
-  },
-  {
-    slug: 'binging-residence',
-    name: 'Binging Residence',
-    desc: '45 min drive from the villa',
-    x: 54,
-    y: 48,
-  },
+interface Marker {
+  slug: string
+  name: string
+  location: string
+  x: number
+  y: number
+}
+
+const FALLBACK_MARKERS: Marker[] = [
+  { slug: 'canggu-residence',  name: 'Canggu Residence', location: 'Canggu, Bali',  x: 46, y: 36 },
+  { slug: 'binging-residence', name: 'Bingin Residence',  location: 'Bingin, Bali',  x: 54, y: 48 },
 ]
 
 export default function MapPage() {
   const [hovered, setHovered] = useState<string | null>(null)
+  const [markers, setMarkers] = useState<Marker[]>([])
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function fetchMarkers() {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('slug, name, location, x, y')
+          .not('x', 'is', null)
+          .not('y', 'is', null)
+          .order('order', { ascending: true })
+
+        if (error || !data || data.length === 0) {
+          setMarkers(FALLBACK_MARKERS)
+        } else {
+          setMarkers(data as Marker[])
+        }
+      } catch {
+        setMarkers(FALLBACK_MARKERS)
+      }
+    }
+    fetchMarkers()
+  }, [])
 
   return (
     <motion.section
@@ -69,14 +89,13 @@ export default function MapPage() {
         >
           <Image
             src="/assets/images/map.png"
-            alt="Villa Serenara Location Map"
+            alt="Villa Location Map"
             width={2594}
             height={1632}
             style={{ display: 'block', width: '100%', height: 'auto' }}
             priority
           />
 
-          {/* Markers */}
           {markers.map((m, i) => (
             <motion.div
               key={m.slug}
@@ -94,7 +113,6 @@ export default function MapPage() {
               onMouseLeave={() => setHovered(null)}
             >
               <Link href={`/project/${m.slug}`} transitionTypes={['nav-forward']} style={{ textDecoration: 'none' }}>
-                {/* Pulse ring */}
                 <span style={{
                   position: 'absolute',
                   bottom: 0,
@@ -108,30 +126,17 @@ export default function MapPage() {
                   pointerEvents: 'none',
                 }} />
 
-                {/* Google Maps-style pin */}
                 <motion.span
                   whileHover={{ scale: 1.2, y: -3 }}
                   transition={{ duration: 0.2 }}
                   style={{ display: 'block', cursor: 'pointer', position: 'relative', lineHeight: 0 }}
                 >
-                  <svg
-                    width="28" height="38"
-                    viewBox="0 0 28 38"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ filter: 'drop-shadow(0 3px 8px rgba(184,146,42,0.55))' }}
-                  >
-                    {/* Pin body */}
-                    <path
-                      d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z"
-                      fill="#b8922a"
-                    />
-                    {/* Inner circle */}
+                  <svg width="28" height="38" viewBox="0 0 28 38" fill="none" style={{ filter: 'drop-shadow(0 3px 8px rgba(184,146,42,0.55))' }}>
+                    <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="#b8922a" />
                     <circle cx="14" cy="13" r="5.5" fill="#fff" opacity="0.9" />
                   </svg>
                 </motion.span>
 
-                {/* Tooltip */}
                 <AnimatePresence>
                   {hovered === m.slug && (
                     <motion.div
@@ -155,17 +160,8 @@ export default function MapPage() {
                       }}
                     >
                       <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 2 }}>{m.name}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.65)' }}>{m.desc}</div>
-                      {/* Caret */}
-                      <div style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        borderLeft: '6px solid transparent',
-                        borderRight: '6px solid transparent',
-                        borderTop: '6px solid rgba(28,21,16,0.9)',
-                      }} />
+                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.65)' }}>{m.location}</div>
+                      <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid rgba(28,21,16,0.9)' }} />
                     </motion.div>
                   )}
                 </AnimatePresence>
