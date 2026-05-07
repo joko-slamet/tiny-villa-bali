@@ -4,8 +4,6 @@ import React from "react";
 import {
   Image as ImageIcon,
   Home,
-  Phone,
-  MapPin,
   LogOut
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
@@ -51,15 +49,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <ImageIcon size={18} />
             Projects
-          </Link>
-
-
-          <Link 
-            href="/admin/edit/contact"
-            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: 'none', background: activeTab === 'contact' ? 'var(--surface)' : 'transparent', color: activeTab === 'contact' ? 'var(--accent-1)' : 'var(--text)', fontWeight: activeTab === 'contact' ? 700 : 500, cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            <Phone size={18} />
-            Contact Info
           </Link>
         </nav>
 
