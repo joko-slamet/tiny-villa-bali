@@ -93,7 +93,7 @@ export default function MapPage() {
               onMouseEnter={() => setHovered(m.slug)}
               onMouseLeave={() => setHovered(null)}
             >
-              <Link href={`/map/${m.slug}`} transitionTypes={['nav-forward']} style={{ textDecoration: 'none' }}>
+              <Link href={`/project/${m.slug}`} transitionTypes={['nav-forward']} style={{ textDecoration: 'none' }}>
                 {/* Pulse ring */}
                 <span style={{
                   position: 'absolute',
