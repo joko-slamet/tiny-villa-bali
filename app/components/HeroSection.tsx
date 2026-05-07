@@ -11,31 +11,20 @@ import {
 } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
-const images = [
-  {
-    src: '/assets/images/1_bed_new.png',
-    alt: 'Bedroom 1',
-    bg: '#cec4b1',
-    name: 'Canggu Residence',
-    status: 'Completed',
-    units: '12 (1 bedroom)',
-    location: 'Canggu, Bali',
-    available: false,
-    slug: "canggu-residence",
-  },
-  {
-    src: '/assets/images/2_bed_new.png',
-    alt: 'Bedroom 2',
-    bg: '#cebeaf',
-    name: 'Bingin Residence',
-    status: 'Completed',
-    units: '16 (1 bedroom)',
-    location: 'Bingin, Bali',
-    available: false,
-    slug: "bingin-residence",
-  },
-]
+interface HeroSlide {
+  id: string;
+  name: string;
+  location: string;
+  status: string;
+  units: string;
+  bg: string;
+  available: boolean;
+  src: string;
+  slug: string;
+  order: number;
+}
 
 const sweepVariants: Variants = {
   enter: (dir: number) => ({ rotateY: dir > 0 ? -75 : 75, rotateX: dir > 0 ? -22 : 22, y: dir > 0 ? -60 : 60, opacity: 0 }),
@@ -57,7 +46,6 @@ const sweepVariants: Variants = {
   }),
 }
 
-
 const MIN_ZOOM = 1
 const MAX_ZOOM = 5
 
@@ -69,8 +57,10 @@ export default function HeroSection() {
   const tiltRef           = useRef<HTMLDivElement>(null)
   const imageContainerRef = useRef<HTMLDivElement>(null)
 
+  const [images, setImages] = useState<HeroSlide[]>([])
   const [current, setCurrent]     = useState(0)
   const [direction, setDirection] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
 
   const zoomRef = useRef(1)
   const panRef  = useRef({ x: 0, y: 0 })
@@ -81,12 +71,62 @@ export default function HeroSection() {
   const [dragging, setDragging] = useState(false)
 
   const clickSound = useRef<HTMLAudioElement | null>(null)
+  const supabase = createClient()
 
   useEffect(() => {
+    fetchSlides()
+    
     clickSound.current = new Audio('/assets/audio/click.wav')
     clickSound.current.volume = 0.5
     clickSound.current.load()
   }, [])
+
+  const fetchSlides = async () => {
+    try {
+      setIsLoading(true)
+      const { data, error } = await supabase
+        .from('hero_slides')
+        .select('*')
+        .order('order', { ascending: true })
+
+      if (error) throw error
+      if (data && data.length > 0) {
+        setImages(data)
+      } else {
+        // Fallback to default images if DB is empty
+        setImages([
+          {
+            id: '1',
+            src: '/assets/images/1_bed_new.png',
+            bg: '#cec4b1',
+            name: 'Canggu Residence',
+            status: 'Completed',
+            units: '12 (1 bedroom)',
+            location: 'Canggu, Bali',
+            available: false,
+            slug: "canggu-residence",
+            order: 1
+          },
+          {
+            id: '2',
+            src: '/assets/images/2_bed_new.png',
+            bg: '#cebeaf',
+            name: 'Bingin Residence',
+            status: 'Completed',
+            units: '16 (1 bedroom)',
+            location: 'Bingin, Bali',
+            available: false,
+            slug: "bingin-residence",
+            order: 2
+          },
+        ])
+      }
+    } catch (err) {
+      console.error("Error fetching hero slides:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const mx  = useMotionValue(0)
   const my  = useMotionValue(0)
@@ -244,6 +284,18 @@ export default function HeroSection() {
     whiteSpace: 'nowrap',
   }
 
+  if (isLoading || images.length === 0) {
+    return (
+      <div style={{ height: 'calc(100vh - var(--nav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#cec4b1' }}>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          style={{ width: '40px', height: '40px', border: '4px solid rgba(0,0,0,0.1)', borderTopColor: '#b8922a', borderRadius: '50%' }}
+        />
+      </div>
+    )
+  }
+
   return (
     <motion.section
       animate={{ backgroundColor: images[current].bg }}
@@ -290,7 +342,7 @@ export default function HeroSection() {
           >
             <AnimatePresence initial={false} custom={direction}>
               <motion.div
-                key={current}
+                key={images[current].id}
                 custom={direction}
                 variants={sweepVariants}
                 initial="enter"
@@ -320,7 +372,7 @@ export default function HeroSection() {
                   <motion.div
                     style={{
                       position: 'absolute',
-                      inset: -20, // Minimalist inset for a very subtle 'micro-interaction' feel
+                      inset: -20,
                       x: imgParallaxX,
                       y: imgParallaxY,
                       rotateX: imgRotateX,
@@ -330,7 +382,7 @@ export default function HeroSection() {
                   >
                     <Image
                       src={images[current].src}
-                      alt={images[current].alt}
+                      alt={images[current].name}
                       fill
                       style={{ objectFit: 'cover', pointerEvents: 'none' }}
                       priority
@@ -421,10 +473,6 @@ export default function HeroSection() {
           </AnimatePresence>
         </div>
 
-
-
-
-
         {/* ── Title strip at bottom ── */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -433,7 +481,6 @@ export default function HeroSection() {
           style={{ marginTop: 48 }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-
             {/* Zoom badge */}
             <AnimatePresence>
               {isZoomed && (
@@ -472,11 +519,7 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'start', gap: 24 }}>
-
-            {/* Left — Empty now, metadata moved to overlay */}
             <div />
-
-            {/* Center — title + button */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
               <AnimatePresence mode="wait">
                 <motion.h2
@@ -518,7 +561,6 @@ export default function HeroSection() {
                 <Link
                   href={`/map?location=${images[current].slug}`}
                   className="btn-primary"
-                  transitionTypes={['nav-forward']}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
@@ -533,8 +575,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-
-      {/* Left arrow (Asymmetrical Center-Anchored) */}
+      {/* Navigation arrows */}
       <AnimatePresence>
         {current > 0 && (
           <motion.button
@@ -544,40 +585,20 @@ export default function HeroSection() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.5 }}
             onClick={() => navigate(-1)}
-            style={{ 
-              ...navBtnBase, 
-              left: 24, 
-              bottom: '50%', 
-              top: 'auto',
-              transform: 'none', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center' 
-            }}
-            className="group"
+            style={{ ...navBtnBase, left: 24, bottom: '50%', top: 'auto', transform: 'none' }}
           >
-            <motion.span 
-              style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-              whileHover={{ opacity: 1, color: '#000' }}
-            >
+            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
               {images[current - 1].name}
             </motion.span>
-            <motion.div
-              whileHover={{ scale: 1.1, background: 'rgba(28,21,16,0.05)' }}
-              style={{
-                width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}
-            >
+            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
-            </motion.div>
+            </div>
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Right arrow (Asymmetrical Center-Anchored) */}
       <AnimatePresence>
         {current < images.length - 1 && (
           <motion.button
@@ -587,32 +608,14 @@ export default function HeroSection() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.5 }}
             onClick={() => navigate(1)}
-            style={{ 
-              ...navBtnBase, 
-              right: 24, 
-              top: '50%', 
-              transform: 'none', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center' 
-            }}
-            className="group"
+            style={{ ...navBtnBase, right: 24, top: '50%', transform: 'none' }}
           >
-            <motion.div
-              whileHover={{ scale: 1.1, background: 'rgba(28,21,16,0.05)' }}
-              style={{
-                width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}
-            >
+            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-            </motion.div>
-            <motion.span 
-              style={{ ...verticalLabelStyle, writingMode: 'vertical-rl' }}
-              whileHover={{ opacity: 1, color: '#000' }}
-            >
+            </div>
+            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl' }}>
               {images[current + 1].name}
             </motion.span>
           </motion.button>
