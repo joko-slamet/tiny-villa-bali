@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Edit2, Trash2, AlertCircle, CheckCircle2,
-  MapPin, Home, Star, Eye, EyeOff,
+  MapPin, Home, Star, Eye, EyeOff, LayoutGrid, List,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,7 +18,7 @@ interface Project {
   status: string;
   units: string;
   available: boolean;
-  featured: boolean;
+
   src: string;
   slug: string;
   order: number;
@@ -30,14 +30,7 @@ const statusColor: Record<string, { bg: string; text: string; dot: string }> = {
   "Coming Soon":{ bg: "rgba(100,116,139,0.08)",text: "#64748b", dot: "#64748b"  },
 };
 
-const FALLBACK: Project[] = [
-  { id: "1", name: "Canggu Residence",  location: "Canggu, Bali",   status: "Completed",   units: "12 units · 1 bedroom", available: false, featured: true,  src: "/assets/images/1_bed_new.png",                   slug: "canggu-residence",  order: 1 },
-  { id: "2", name: "Bingin Residence",  location: "Bingin, Bali",   status: "Completed",   units: "16 units · 1 bedroom", available: true,  featured: true,  src: "/assets/images/binging/bingin-pool.png",         slug: "binging-residence", order: 2 },
-  { id: "3", name: "Seminyak Villas",   location: "Seminyak, Bali", status: "Under Construction", units: "8 units · 2 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-bedroom.png",      slug: "seminyak-villas",   order: 3 },
-  { id: "4", name: "Ubud Retreat",      location: "Ubud, Bali",     status: "Coming Soon", units: "6 units · 3 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-living-room.png",  slug: "ubud-retreat",      order: 4 },
-  { id: "5", name: "Jimbaran Estate",   location: "Jimbaran, Bali", status: "Coming Soon", units: "4 units · 4 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-kitchen.png",      slug: "jimbaran-estate",   order: 5 },
-  { id: "6", name: "Uluwatu Cliff",     location: "Uluwatu, Bali",  status: "Under Construction", units: "10 units · 2 bedroom", available: false, featured: false, src: "/assets/images/binging/bingin-parking.png",      slug: "uluwatu-cliff",     order: 6 },
-];
+
 
 export default function AdminProjectsPage() {
   const [projects, setProjects]   = useState<Project[]>([]);
@@ -46,6 +39,7 @@ export default function AdminProjectsPage() {
   const [success, setSuccess]     = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Project | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
 
   const supabase = createClient();
 
@@ -59,16 +53,11 @@ export default function AdminProjectsPage() {
         .select("*")
         .order("order", { ascending: true });
 
-      if (error?.code === "42P01" || error?.code === "PGRST116") {
-        setProjects(FALLBACK);
-      } else if (error) {
-        throw error;
-      } else {
-        setProjects(data?.length ? data : FALLBACK);
-      }
+      if (error) throw error;
+      setProjects(data || []);
     } catch (err: any) {
-      setError("Could not connect to database. Showing placeholder data.");
-      setProjects(FALLBACK);
+      setError("Could not connect to database.");
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +88,6 @@ export default function AdminProjectsPage() {
     total: projects.length,
     completed: projects.filter((p) => p.status === "Completed").length,
     available: projects.filter((p) => p.available).length,
-    featured: projects.filter((p) => p.featured).length,
   };
 
   return (
@@ -108,19 +96,50 @@ export default function AdminProjectsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
 
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "40px", flexWrap: "wrap", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "40px", flexWrap: "wrap", gap: 16 }}>
             <div>
               <h1 style={{ fontSize: "1.8rem", fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 4 }}>Projects</h1>
               <p style={{ color: "var(--muted-2)", fontSize: "0.9rem" }}>Manage all villa projects shown on the public portfolio.</p>
             </div>
-            <Link
-              href="/admin/edit/projects/new"
-              className="btn-primary"
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 24px", textDecoration: "none" }}
-            >
-              <Plus size={18} />
-              Add Project
-            </Link>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {/* View Toggle */}
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.5)", padding: 4, borderRadius: 10, border: "1px solid var(--border)" }}>
+                <button 
+                  onClick={() => setViewMode("list")}
+                  style={{ 
+                    display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 7, border: "none",
+                    background: viewMode === "list" ? "#fff" : "transparent",
+                    color: viewMode === "list" ? "var(--text)" : "var(--muted-2)",
+                    boxShadow: viewMode === "list" ? "0 2px 4px rgba(0,0,0,0.05)" : "none",
+                    cursor: "pointer", transition: "all 0.2s"
+                  }}
+                >
+                  <List size={18} />
+                </button>
+                <button 
+                  onClick={() => setViewMode("grid")}
+                  style={{ 
+                    display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 7, border: "none",
+                    background: viewMode === "grid" ? "#fff" : "transparent",
+                    color: viewMode === "grid" ? "var(--text)" : "var(--muted-2)",
+                    boxShadow: viewMode === "grid" ? "0 2px 4px rgba(0,0,0,0.05)" : "none",
+                    cursor: "pointer", transition: "all 0.2s"
+                  }}
+                >
+                  <LayoutGrid size={18} />
+                </button>
+              </div>
+
+              <Link
+                href="/admin/edit/projects/new"
+                className="btn-primary"
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 24px", textDecoration: "none" }}
+              >
+                <Plus size={18} />
+                Add Project
+              </Link>
+            </div>
           </div>
 
           {/* Toasts */}
@@ -140,12 +159,11 @@ export default function AdminProjectsPage() {
           </AnimatePresence>
 
           {/* Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--border)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--border)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", marginBottom: 32 }}>
             {[
               { label: "Total", value: stats.total },
               { label: "Completed", value: stats.completed },
               { label: "Available", value: stats.available },
-              { label: "Featured", value: stats.featured },
             ].map(({ label, value }) => (
               <div key={label} style={{ background: "rgba(255,255,255,0.6)", padding: "20px 24px", textAlign: "center" }}>
                 <div style={{ fontSize: "1.6rem", fontWeight: 800, letterSpacing: "-0.5px", background: "var(--grad)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{value}</div>
@@ -161,101 +179,195 @@ export default function AdminProjectsPage() {
                 style={{ width: 36, height: 36, border: "3px solid var(--border)", borderTopColor: "var(--accent-1)", borderRadius: "50%" }} />
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: viewMode === "list" ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))", 
+              gap: viewMode === "list" ? 12 : 24 
+            }}>
               {projects.map((project, i) => {
                 const sc = statusColor[project.status] ?? statusColor["Coming Soon"];
                 const isDeleting = deletingId === project.id;
 
+                if (viewMode === "list") {
+                  return (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: isDeleting ? 0.4 : 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: i * 0.04 }}
+                      style={{
+                        background: "rgba(255,255,255,0.7)",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        display: "grid",
+                        gridTemplateColumns: "120px 1fr auto",
+                        alignItems: "center",
+                        gap: 0,
+                        transition: "box-shadow 0.2s",
+                      }}
+                    >
+                      {/* Thumbnail */}
+                      <div style={{ position: "relative", height: 90, flexShrink: 0 }}>
+                        {project.src ? (
+                          <Image src={project.src} alt={project.name} fill style={{ objectFit: "cover" }} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
+                            <Home size={24} strokeWidth={1.2} />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+                        <div style={{ minWidth: 180 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)" }}>{project.name}</span>
+
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--muted-2)", fontSize: "0.8rem" }}>
+                            <MapPin size={12} />
+                            {project.location}
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, background: sc.bg, border: `1px solid ${sc.dot}22` }}>
+                          <div style={{ width: 6, height: 6, borderRadius: "50%", background: sc.dot }} />
+                          <span style={{ fontSize: "0.72rem", fontWeight: 700, color: sc.text, letterSpacing: "0.5px" }}>{project.status}</span>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          {project.available ? (
+                            <><Eye size={14} color="#059669" /><span style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 600 }}>Available</span></>
+                          ) : (
+                            <><EyeOff size={14} color="var(--muted)" /><span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>Not Available</span></>
+                          )}
+                        </div>
+
+                        <span style={{ fontSize: "0.78rem", color: "var(--muted-2)" }}>{project.units}</span>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
+                        <Link
+                          href={`/admin/edit/projects/${project.slug}`}
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: 6,
+                            padding: "8px 16px", borderRadius: 10,
+                            background: "var(--surface)", border: "1px solid var(--border-h)",
+                            color: "var(--text)", textDecoration: "none",
+                            fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          <Edit2 size={14} /> Edit
+                        </Link>
+                        <button
+                          onClick={() => setConfirmDelete(project)}
+                          disabled={isDeleting}
+                          style={{
+                            display: "inline-flex", alignItems: "center", justifyContent: "center",
+                            width: 36, height: 36, borderRadius: 10,
+                            background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.2)",
+                            color: "#dc2626", cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                }
+
+                {/* Grid Mode */}
                 return (
                   <motion.div
                     key={project.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: isDeleting ? 0.4 : 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: i * 0.04 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: isDeleting ? 0.4 : 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
                     style={{
                       background: "rgba(255,255,255,0.7)",
                       backdropFilter: "blur(8px)",
                       border: "1px solid var(--border)",
-                      borderRadius: 16,
+                      borderRadius: 20,
                       overflow: "hidden",
-                      display: "grid",
-                      gridTemplateColumns: "120px 1fr auto",
-                      alignItems: "center",
-                      gap: 0,
-                      transition: "box-shadow 0.2s",
+                      display: "flex",
+                      flexDirection: "column",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      position: "relative",
                     }}
                   >
-                    {/* Thumbnail */}
-                    <div style={{ position: "relative", height: 90, flexShrink: 0 }}>
+                    {/* Thumbnail Grid */}
+                    <div style={{ position: "relative", height: 200, width: "100%" }}>
                       {project.src ? (
                         <Image src={project.src} alt={project.name} fill style={{ objectFit: "cover" }} />
                       ) : (
                         <div style={{ width: "100%", height: "100%", background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
-                          <Home size={24} strokeWidth={1.2} />
+                          <Home size={32} strokeWidth={1.2} />
                         </div>
                       )}
+                      
+                      {/* Floating Badges */}
+                      <div style={{ position: "absolute", top: 12, left: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 99, background: sc.bg, border: `1px solid ${sc.dot}22`, backdropFilter: "blur(4px)" }}>
+                          <div style={{ width: 6, height: 6, borderRadius: "50%", background: sc.dot }} />
+                          <span style={{ fontSize: "0.65rem", fontWeight: 700, color: sc.text, letterSpacing: "0.5px", textTransform: "uppercase" }}>{project.status}</span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Info */}
-                    <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-                      <div style={{ minWidth: 180 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)" }}>{project.name}</span>
-                          {project.featured && (
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", background: "rgba(184,146,42,0.1)", color: "var(--accent-1)", border: "1px solid rgba(184,146,42,0.25)", padding: "2px 8px", borderRadius: 99 }}>
-                              <Star size={9} fill="currentColor" /> Featured
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--muted-2)", fontSize: "0.8rem" }}>
-                          <MapPin size={12} />
+                    {/* Info Grid */}
+                    <div style={{ padding: "20px", flex: 1, display: "flex", flexDirection: "column" }}>
+                      <div style={{ marginBottom: 16 }}>
+                        <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text)", marginBottom: 6 }}>{project.name}</h3>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--muted-2)", fontSize: "0.85rem" }}>
+                          <MapPin size={14} />
                           {project.location}
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, background: sc.bg, border: `1px solid ${sc.dot}22` }}>
-                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: sc.dot }} />
-                        <span style={{ fontSize: "0.72rem", fontWeight: 700, color: sc.text, letterSpacing: "0.5px" }}>{project.status}</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+                        <span style={{ fontSize: "0.8rem", color: "var(--muted-2)", fontWeight: 500 }}>{project.units}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          {project.available ? (
+                            <><Eye size={14} color="#059669" /><span style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 700 }}>Available</span></>
+                          ) : (
+                            <><EyeOff size={14} color="var(--muted)" /><span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Sold Out</span></>
+                          )}
+                        </div>
                       </div>
-
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {project.available ? (
-                          <><Eye size={14} color="#059669" /><span style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 600 }}>Available</span></>
-                        ) : (
-                          <><EyeOff size={14} color="var(--muted)" /><span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>Not Available</span></>
-                        )}
-                      </div>
-
-                      <span style={{ fontSize: "0.78rem", color: "var(--muted-2)" }}>{project.units}</span>
                     </div>
 
-                    {/* Actions */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
+                    {/* Actions Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 48px", gap: 8, padding: "0 20px 20px" }}>
                       <Link
                         href={`/admin/edit/projects/${project.slug}`}
                         style={{
-                          display: "inline-flex", alignItems: "center", gap: 6,
-                          padding: "8px 16px", borderRadius: 10,
-                          background: "var(--surface)", border: "1px solid var(--border-h)",
-                          color: "var(--text)", textDecoration: "none",
-                          fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
+                          display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+                          padding: "10px", borderRadius: 12,
+                          background: "var(--text)", color: "#fff", textDecoration: "none",
+                          fontSize: "0.85rem", fontWeight: 700,
                           transition: "all 0.2s",
                         }}
                       >
-                        <Edit2 size={14} /> Edit
+                        <Edit2 size={15} /> Edit Details
                       </Link>
                       <button
                         onClick={() => setConfirmDelete(project)}
                         disabled={isDeleting}
                         style={{
                           display: "inline-flex", alignItems: "center", justifyContent: "center",
-                          width: 36, height: 36, borderRadius: 10,
-                          background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.2)",
+                          borderRadius: 12,
+                          background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.1)",
                           color: "#dc2626", cursor: "pointer",
                           transition: "all 0.2s",
                         }}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </motion.div>
@@ -273,26 +385,6 @@ export default function AdminProjectsPage() {
             </div>
           )}
 
-          {/* Add button bottom */}
-          <motion.button
-            whileHover={{ scale: 1.005 }}
-            whileTap={{ scale: 0.995 }}
-            onClick={() => window.location.href = "/admin/edit/projects/new"}
-            style={{
-              width: "100%", marginTop: 16, padding: "18px",
-              borderRadius: 14, border: "2px dashed var(--border-h)",
-              background: "rgba(255,255,255,0.3)", color: "var(--muted-2)",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
-              cursor: "pointer", transition: "all 0.2s", fontSize: "0.9rem",
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.borderColor = "var(--accent-1)"; e.currentTarget.style.color = "var(--accent-1)"; e.currentTarget.style.background = "rgba(184,146,42,0.03)"; }}
-            onMouseOut={(e)  => { e.currentTarget.style.borderColor = "var(--border-h)";  e.currentTarget.style.color = "var(--muted-2)";  e.currentTarget.style.background = "rgba(255,255,255,0.3)"; }}
-          >
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(184,146,42,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Plus size={16} />
-            </div>
-            <span style={{ fontWeight: 700 }}>Add New Project</span>
-          </motion.button>
 
         </motion.div>
       </div>

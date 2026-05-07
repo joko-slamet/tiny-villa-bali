@@ -27,7 +27,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (pathname.includes('/admin/edit/home')) activeTab = 'home';
   else if (pathname.includes('/admin/edit/projects')) activeTab = 'projects';
   else if (pathname.includes('/admin/edit/contact')) activeTab = 'contact';
-  else if (pathname.includes('/admin/edit/map')) activeTab = 'map';
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - var(--nav-h, 72px))', width: '100%', backgroundColor: 'var(--bg)', overflow: 'hidden' }}>
@@ -53,13 +52,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ImageIcon size={18} />
             Projects
           </Link>
-          <Link 
-            href="/admin/edit/map"
-            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: 'none', background: activeTab === 'map' ? 'var(--surface)' : 'transparent', color: activeTab === 'map' ? 'var(--accent-1)' : 'var(--text)', fontWeight: activeTab === 'map' ? 700 : 500, cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            <MapPin size={18} />
-            Map
-          </Link>
+
+
           <Link 
             href="/admin/edit/contact"
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: 'none', background: activeTab === 'contact' ? 'var(--surface)' : 'transparent', color: activeTab === 'contact' ? 'var(--accent-1)' : 'var(--text)', fontWeight: activeTab === 'contact' ? 700 : 500, cursor: 'pointer', transition: 'all 0.2s' }}

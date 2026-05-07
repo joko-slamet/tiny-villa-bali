@@ -1,98 +1,133 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
-const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface Marker {
-  slug: string
-  name: string
-  location: string
-  x: number
-  y: number
+  slug: string;
+  name: string;
+  location: string;
+  src: string;
+  x: number;
+  y: number;
 }
 
-const FALLBACK_MARKERS: Marker[] = [
-  { slug: 'canggu-residence',  name: 'Canggu Residence', location: 'Canggu, Bali',  x: 46, y: 36 },
-  { slug: 'binging-residence', name: 'Bingin Residence',  location: 'Bingin, Bali',  x: 54, y: 48 },
-]
-
 export default function MapPage() {
-  const [hovered, setHovered] = useState<string | null>(null)
-  const [markers, setMarkers] = useState<Marker[]>([])
-  const supabase = createClient()
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
+  const supabase = createClient();
 
   useEffect(() => {
     async function fetchMarkers() {
       try {
         const { data, error } = await supabase
-          .from('projects')
-          .select('slug, name, location, x, y')
-          .not('x', 'is', null)
-          .not('y', 'is', null)
-          .order('order', { ascending: true })
+          .from("projects")
+          .select("slug, name, location, src, x, y")
+          .not("x", "is", null)
+          .not("y", "is", null)
+          .order("order", { ascending: true });
 
-        if (error || !data || data.length === 0) {
-          setMarkers(FALLBACK_MARKERS)
-        } else {
-          setMarkers(data as Marker[])
+        if (!error && data && data.length > 0) {
+          setMarkers(data as Marker[]);
         }
       } catch {
-        setMarkers(FALLBACK_MARKERS)
+        // no-op
       }
     }
-    fetchMarkers()
-  }, [])
+    fetchMarkers();
+  }, []);
 
   return (
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ duration: 0.6 }}
       style={{
-        minHeight: 'calc(100vh - var(--nav-h))',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'clamp(40px, 6vh, 80px) clamp(24px, 6vw, 80px)',
-        background: 'var(--bg)',
+        height: "calc(100vh - var(--nav-h))",
+        width: "100%",
+        position: "relative",
+        background: "var(--bg)",
+        overflow: "hidden",
       }}
     >
-      <div style={{ width: '100%', maxWidth: 900 }}>
+      {/* Cinematic Header Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          top: 40,
+          left: 40,
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      >
         <motion.p
-          className="section-label"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease }}
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            letterSpacing: "4px",
+            textTransform: "uppercase",
+            color: "var(--muted-2)",
+            marginBottom: 8,
+          }}
         >
-          Location
+          Master Plan
         </motion.p>
-
         <motion.h1
-          className="section-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.18, ease }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3, ease }}
+          style={{
+            fontSize: "3.5rem",
+            fontWeight: 800,
+            letterSpacing: "-2px",
+            color: "var(--text)",
+            margin: 0,
+          }}
         >
-          Find Us
+          Project Map
         </motion.h1>
+      </div>
 
+      {/* Map Content */}
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px",
+        }}
+      >
         <motion.div
-          initial={{ opacity: 0, y: 32, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.28, ease }}
-          style={{ marginTop: 32, borderRadius: 24, overflow: 'hidden', position: 'relative' }}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease }}
+          style={{
+            position: "relative",
+            width: "100%",
+            maxWidth: "calc((100vh - var(--nav-h, 72px) - 80px) * 2594 / 1632)",
+          }}
         >
           <Image
             src="/assets/images/map.png"
             alt="Villa Location Map"
             width={2594}
             height={1632}
-            style={{ display: 'block', width: '100%', height: 'auto' }}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              borderRadius: 14,
+            }}
             priority
           />
 
@@ -101,67 +136,117 @@ export default function MapPage() {
               key={m.slug}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.6 + i * 0.15, ease }}
+              transition={{ duration: 0.5, delay: 0.8 + i * 0.1, ease }}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 left: `${m.x}%`,
-                top: `${m.y}%`,
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10,
+                top: `${m.y - 3}%`,
+                transform: "translate(-50%, -100%)",
+                zIndex: hovered === m.slug ? 100 : 10,
               }}
               onMouseEnter={() => setHovered(m.slug)}
               onMouseLeave={() => setHovered(null)}
             >
-              <Link href={`/project/${m.slug}`} transitionTypes={['nav-forward']} style={{ textDecoration: 'none' }}>
-                <span style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: 'rgba(184,146,42,0.25)',
-                  animation: 'pulse-ring 2s ease-in-out infinite',
-                  pointerEvents: 'none',
-                }} />
+              <Link
+                href={`/project/${m.slug}`}
+                style={{ textDecoration: "none" }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    background: "rgba(184,146,42,0.3)",
+                    animation: "pulse-ring 2s ease-in-out infinite",
+                    pointerEvents: "none",
+                  }}
+                />
 
-                <motion.span
-                  whileHover={{ scale: 1.2, y: -3 }}
+                <motion.div
+                  animate={{
+                    scale: hovered === m.slug ? 1.25 : 1,
+                    y: hovered === m.slug ? -5 : 0,
+                  }}
                   transition={{ duration: 0.2 }}
-                  style={{ display: 'block', cursor: 'pointer', position: 'relative', lineHeight: 0 }}
+                  style={{
+                    display: "block",
+                    cursor: "pointer",
+                    position: "relative",
+                  }}
                 >
-                  <svg width="28" height="38" viewBox="0 0 28 38" fill="none" style={{ filter: 'drop-shadow(0 3px 8px rgba(184,146,42,0.55))' }}>
-                    <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="#b8922a" />
+                  <svg
+                    width="28"
+                    height="38"
+                    viewBox="0 0 28 38"
+                    fill="none"
+                    style={{
+                      filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
+                    }}
+                  >
+                    <path
+                      d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z"
+                      fill="#b8922a"
+                    />
                     <circle cx="14" cy="13" r="5.5" fill="#fff" opacity="0.9" />
                   </svg>
-                </motion.span>
+                </motion.div>
 
                 <AnimatePresence>
                   {hovered === m.slug && (
                     <motion.div
-                      initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                      transition={{ duration: 0.18, ease }}
+                      exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
                       style={{
-                        position: 'absolute',
-                        bottom: 'calc(100% + 10px)',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: 'rgba(28,21,16,0.9)',
-                        backdropFilter: 'blur(12px)',
-                        color: '#fff',
-                        borderRadius: 10,
-                        padding: '8px 14px',
-                        whiteSpace: 'nowrap',
-                        pointerEvents: 'none',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                        position: "absolute",
+                        bottom: "calc(100% + 12px)",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "rgba(255,255,255,0.95)",
+                        backdropFilter: "blur(12px)",
+                        color: "#1a1a1a",
+                        borderRadius: 14,
+                        overflow: "hidden",
+                        whiteSpace: "normal",
+                        pointerEvents: "none",
+                        boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
+                        width: 280,
                       }}
                     >
-                      <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 2 }}>{m.name}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.65)' }}>{m.location}</div>
-                      <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid rgba(28,21,16,0.9)' }} />
+                      {m.src && (
+                        <div style={{ position: "relative", width: "100%", height: 120 }}>
+                          <Image
+                            src={m.src}
+                            alt={m.name}
+                            fill
+                            style={{ objectFit: "cover" }}
+                          />
+                        </div>
+                      )}
+                      <div style={{ padding: "12px 14px" }}>
+                        <div style={{ fontSize: "0.9rem", fontWeight: 800, marginBottom: 2 }}>
+                          {m.name}
+                        </div>
+                        <div style={{ fontSize: "0.75rem", opacity: 0.6, fontWeight: 500 }}>
+                          {m.location}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "100%",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          borderLeft: "7px solid transparent",
+                          borderRight: "7px solid transparent",
+                          borderTop: "7px solid rgba(255,255,255,0.95)",
+                        }}
+                      />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -170,6 +255,25 @@ export default function MapPage() {
           ))}
         </motion.div>
       </div>
+
+      {/* Footer Instruction */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        style={{
+          position: "absolute",
+          bottom: 40,
+          right: 40,
+          color: "var(--muted-2)",
+          fontSize: "0.7rem",
+          fontWeight: 600,
+          letterSpacing: "1px",
+          textTransform: "uppercase",
+        }}
+      >
+        Click markers to explore projects
+      </motion.div>
     </motion.section>
-  )
+  );
 }

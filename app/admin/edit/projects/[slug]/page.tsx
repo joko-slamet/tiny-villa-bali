@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Save, Image as ImageIcon, Upload, Type,
   MapPin, Info, CheckCircle2, AlertCircle, Star, Link as LinkIcon,
-  AlignLeft, List, DollarSign, Globe,
+  AlignLeft, List, DollarSign, Globe, Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -235,7 +235,11 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
                 <div className="form-group">
                   <label className="form-label" style={{ fontWeight: 600 }}>Project Name *</label>
                   <input className="form-input" type="text" placeholder="e.g. Canggu Residence"
-                    value={form.name} onChange={(e) => update("name", e.target.value)} />
+                    value={form.name} onChange={(e) => {
+                      const name = e.target.value;
+                      update("name", name);
+                      if (isNew) update("slug", name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""));
+                    }} />
                 </div>
                 <div className="form-group">
                   <label className="form-label" style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
@@ -557,7 +561,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
                   position: "absolute",
                   left: `${form.x}%`,
                   top:  `${form.y}%`,
-                  transform: "translate(-50%, -50%)",
+                  transform: "translate(-50%, -100%)",
                   pointerEvents: "none",
                   zIndex: 10,
                 }}>
@@ -652,8 +656,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
               style={{ padding: "12px 32px", gap: 8, opacity: isSaving ? 0.8 : 1 }}
             >
               {isSaving ? (
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
-                  <Save size={18} style={{ opacity: 0.5 }} />
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}>
+                  <Loader2 size={18} />
                 </motion.div>
               ) : (
                 <Save size={18} />
