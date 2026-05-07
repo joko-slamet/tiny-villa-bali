@@ -133,6 +133,12 @@ function navBtn(side: "left" | "right"): React.CSSProperties {
   return { position: "absolute", top: "50%", transform: "translateY(-50%)", [side]: -60, width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" };
 }
 
+function formatIDR(raw: string): string {
+  const num = parseInt(raw.replace(/\D/g, ""), 10);
+  if (isNaN(num)) return raw;
+  return num.toLocaleString("id-ID");
+}
+
 function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.7, delay, ease }}>
@@ -284,8 +290,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
         {/* Price */}
         {project.price && (
           <Reveal>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 99, border: "1px solid var(--border-h)", background: "var(--surface)", marginBottom: 32 }}>
-              <span style={{ fontSize: "0.73rem", fontWeight: 700, color: "var(--accent-1)", letterSpacing: "0.5px" }}>{project.price}</span>
+            <div style={{ display: "inline-flex", alignItems: "stretch", marginBottom: 48, borderRadius: 16, overflow: "hidden", border: "1px solid rgba(184,146,42,0.25)", boxShadow: "0 4px 32px rgba(184,146,42,0.08)" }}>
+              {/* Accent bar */}
+              <div style={{ width: 4, background: "linear-gradient(to bottom, #e8c870, #b8922a)", flexShrink: 0 }} />
+              <div style={{ padding: "20px 28px", background: "linear-gradient(135deg, rgba(184,146,42,0.07) 0%, transparent 100%)" }}>
+                <p style={{ fontSize: "0.85rem", fontWeight: 700, letterSpacing: "6px", textTransform: "uppercase", color: "var(--accent-1)", marginBottom: 8 }}>
+                  IDR
+                </p>
+                <p style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 200, letterSpacing: "3px", color: "var(--text)", lineHeight: 1 }}>
+                  {formatIDR(project.price)}
+                </p>
+              </div>
             </div>
           </Reveal>
         )}
