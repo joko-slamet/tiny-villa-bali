@@ -313,7 +313,7 @@ function ListItem({ project, index }: { project: Project; index: number }) {
           </div>
 
           <motion.div animate={{ scale: hovered ? 1.04 : 1, rotateY: hovered ? -4 : 0 }} transition={{ duration: 0.5, ease }}
-            style={{ position: "relative", height: 100, borderRadius: 12, overflow: "hidden", transformStyle: "preserve-3d", boxShadow: hovered ? "0 16px 48px rgba(28,21,16,0.22)" : "0 4px 16px rgba(28,21,16,0.12)", transition: "box-shadow 0.4s ease" }}>
+            style={{ position: "relative", height: 180, borderRadius: 12, overflow: "hidden", transformStyle: "preserve-3d", boxShadow: hovered ? "0 16px 48px rgba(28,21,16,0.22)" : "0 4px 16px rgba(28,21,16,0.12)", transition: "box-shadow 0.4s ease" }}>
             <Image src={project.src} alt={project.name} fill style={{ objectFit: "cover" }} />
             <motion.div animate={{ opacity: hovered ? 0 : 0.3 }} style={{ position: "absolute", inset: 0, background: "var(--bg)" }} />
           </motion.div>
