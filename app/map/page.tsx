@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -17,20 +18,28 @@ interface Marker {
   y: number;
 }
 
-export default function MapPage() {
+function MapContent() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
+  const searchParams = useSearchParams();
+  const locationFilter = searchParams.get("location");
   const supabase = createClient();
 
   useEffect(() => {
     async function fetchMarkers() {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("projects")
           .select("slug, name, location, src, x, y")
           .not("x", "is", null)
           .not("y", "is", null)
           .order("order", { ascending: true });
+
+        if (locationFilter) {
+          query = query.eq("slug", locationFilter);
+        }
+
+        const { data, error } = await query;
 
         if (!error && data && data.length > 0) {
           setMarkers(data as Marker[]);
@@ -40,7 +49,7 @@ export default function MapPage() {
       }
     }
     fetchMarkers();
-  }, []);
+  }, [locationFilter]);
 
   return (
     <motion.section
@@ -275,5 +284,13 @@ export default function MapPage() {
         Click markers to explore projects
       </motion.div>
     </motion.section>
+  );
+}
+
+export default function MapPage() {
+  return (
+    <Suspense>
+      <MapContent />
+    </Suspense>
   );
 }
