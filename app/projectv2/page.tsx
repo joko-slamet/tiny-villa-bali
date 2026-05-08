@@ -170,6 +170,7 @@ function CoverflowStage({ projects }: { projects: Project[] }) {
           return (
             <motion.div
               key={project.slug}
+              initial={{ x: cfg.x, rotateY: cfg.rotateY, scale: cfg.scale, z: cfg.z, opacity: 0 }}
               animate={{ x: cfg.x, rotateY: cfg.rotateY, scale: cfg.scale, z: cfg.z, opacity: cfg.opacity }}
               transition={{ type: "spring", stiffness: 220, damping: 30 }}
               onClick={isCenter ? undefined : () => setCurrent(index)}
