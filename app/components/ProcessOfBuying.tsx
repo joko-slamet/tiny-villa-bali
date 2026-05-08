@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STEPS = [
@@ -23,12 +23,25 @@ const STEPS = [
 
 export default function ProcessOfBuying() {
   const [open, setOpen] = useState(false)
+  const clickSound = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    clickSound.current = new Audio('/assets/audio/click.wav')
+    clickSound.current.volume = 0.5
+    clickSound.current.load()
+  }, [])
 
   return (
     <>
       {/* ── Trigger ── */}
       <motion.button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          if (clickSound.current) {
+            clickSound.current.currentTime = 0
+            clickSound.current.play().catch(() => {})
+          }
+          setOpen(true)
+        }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -82,223 +95,160 @@ export default function ProcessOfBuying() {
           Process of Buying
         </span>
 
-        {/* Arrow */}
+        {/* 3D Arrow */}
         <motion.span
           animate={{ x: [0, 4, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ fontSize: '0.8rem', opacity: 0.8, lineHeight: 1 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18 }}
         >
-          ↗
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Shadow layer — depth illusion */}
+            <path d="M3.5 13.5 L13.5 3.5" stroke="rgba(80,50,0,0.35)" strokeWidth="2.8" strokeLinecap="round"/>
+            <path d="M7 3.5 L13.5 3.5 L13.5 10" stroke="rgba(80,50,0,0.35)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            {/* Arrowhead face */}
+            <path d="M3 13 L13 3" stroke="#f0d080" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M6.5 3 L13 3 L13 9.5" stroke="#f0d080" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            {/* Top highlight */}
+            <path d="M7 3 L13 3" stroke="rgba(255,245,180,0.7)" strokeWidth="0.8" strokeLinecap="round"/>
+          </svg>
         </motion.span>
       </motion.button>
 
-      {/* ── Modal Overlay ── */}
+      {/* ── Click-outside catcher ── */}
+      {open && (
+        <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
+      )}
+
+      {/* ── Popover card ── */}
       <AnimatePresence>
         {open && (
           <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45 }}
-            onClick={() => setOpen(false)}
+            key="panel"
+            initial={{ opacity: 0, y: 20, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            onClick={e => e.stopPropagation()}
             style={{
               position: 'fixed',
-              inset: 0,
+              bottom: 116,
+              left: 40,
+              width: 400,
               zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(8,6,3,0.97)',
-              backdropFilter: 'blur(28px)',
-              WebkitBackdropFilter: 'blur(28px)',
-              perspective: '1400px',
+              background: 'rgba(255,251,242,0.97)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid rgba(184,146,42,0.3)',
+              borderRadius: 20,
+              boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 0 60px rgba(184,146,42,0.06)',
+              overflow: 'hidden',
             }}
           >
-            {/* Ambient glow */}
-            <div style={{
-              position: 'absolute',
-              top: '30%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 600,
-              height: 600,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(184,146,42,0.07) 0%, transparent 70%)',
-              pointerEvents: 'none',
-            }} />
-
-            {/* Content panel */}
+            {/* Gold top border line */}
             <motion.div
-              key="panel"
-              initial={{ opacity: 0, y: 80, rotateX: 18, scale: 0.88 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -50, rotateX: -12, scale: 0.93 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              onClick={e => e.stopPropagation()}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                width: '90%',
-                maxWidth: 700,
-                transformStyle: 'preserve-3d',
+                height: 2,
+                background: 'linear-gradient(90deg, transparent, #b8922a, #f0d080, #b8922a, transparent)',
+                transformOrigin: 'left',
               }}
-            >
+            />
+
+            {/* Content */}
+            <div style={{ padding: '24px 28px 28px' }}>
               {/* Header */}
-              <motion.div
-                initial={{ opacity: 0, y: -24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                style={{ marginBottom: 52, textAlign: 'center' }}
-              >
+              <div style={{ marginBottom: 24 }}>
                 <p style={{
-                  fontSize: '0.6rem',
+                  fontSize: '0.55rem',
                   fontWeight: 700,
-                  letterSpacing: '7px',
+                  letterSpacing: '5px',
                   textTransform: 'uppercase',
                   color: '#b8922a',
-                  marginBottom: 18,
+                  marginBottom: 6,
                 }}>
                   Tiny Villa Bali
                 </p>
                 <h2 style={{
-                  fontSize: 'clamp(2.4rem, 6vw, 4.8rem)',
-                  fontWeight: 900,
-                  letterSpacing: '-2px',
-                  color: '#f5ede0',
-                  lineHeight: 1,
+                  fontSize: '1.35rem',
+                  fontWeight: 800,
+                  letterSpacing: '-0.5px',
+                  color: '#1a1208',
                   margin: 0,
+                  lineHeight: 1.2,
                 }}>
                   Process of Buying
                 </h2>
-
-                {/* Animated gold line */}
-                <div style={{ position: 'relative', marginTop: 28, height: 1 }}>
-                  <motion.div
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: 1 }}
-                    transition={{ delay: 0.55, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    style={{
-                      height: '100%',
-                      background: 'linear-gradient(90deg, transparent 0%, #b8922a 40%, #f0d080 60%, #b8922a 80%, transparent 100%)',
-                      transformOrigin: 'center',
-                    }}
-                  />
-                  {/* Center diamond */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.75, duration: 0.4 }}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%) rotate(45deg)',
-                      width: 7,
-                      height: 7,
-                      background: '#f0d080',
-                    }}
-                  />
-                </div>
-              </motion.div>
+              </div>
 
               {/* Steps */}
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {STEPS.map((step, i) => (
                   <motion.div
                     key={step.n}
-                    initial={{ opacity: 0, x: -50, rotateY: -10 }}
-                    animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                    transition={{
-                      delay: 0.45 + i * 0.18,
-                      duration: 0.75,
-                      ease: [0.22, 1, 0.36, 1],
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '40px 1fr',
+                      gap: 16,
+                      padding: '18px 0',
+                      borderBottom: i < STEPS.length - 1 ? '1px solid rgba(184,146,42,0.08)' : 'none',
+                      alignItems: 'start',
                     }}
                   >
-                    <motion.div
-                      whileHover={{ x: 10, transition: { duration: 0.3 } }}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '72px 1fr',
-                        gap: 28,
-                        padding: '32px 0',
-                        borderBottom: i < STEPS.length - 1
-                          ? '1px solid rgba(184,146,42,0.1)'
-                          : 'none',
-                        alignItems: 'start',
-                        cursor: 'default',
-                      }}
-                    >
-                      {/* Number */}
-                      <div style={{
-                        fontSize: '4rem',
-                        fontWeight: 900,
-                        color: 'rgba(184,146,42,0.12)',
-                        lineHeight: 1,
-                        letterSpacing: '-3px',
-                        userSelect: 'none',
-                        paddingTop: 2,
+                    <div style={{
+                      fontSize: '2rem',
+                      fontWeight: 900,
+                      color: 'rgba(184,146,42,0.25)',
+                      lineHeight: 1,
+                      letterSpacing: '-1px',
+                      userSelect: 'none',
+                      paddingTop: 1,
+                    }}>
+                      {step.n}
+                    </div>
+                    <div>
+                      <h3 style={{
+                        fontSize: '0.6rem',
+                        fontWeight: 800,
+                        letterSpacing: '4px',
+                        textTransform: 'uppercase',
+                        color: '#b8922a',
+                        marginBottom: 6,
                       }}>
-                        {step.n}
-                      </div>
-
-                      {/* Text */}
-                      <div>
-                        <h3 style={{
-                          fontSize: '0.65rem',
-                          fontWeight: 800,
-                          letterSpacing: '5px',
-                          textTransform: 'uppercase',
-                          color: '#b8922a',
-                          marginBottom: 12,
-                        }}>
-                          {step.title}
-                        </h3>
-                        <p style={{
-                          fontSize: '0.975rem',
-                          color: 'rgba(245,237,224,0.58)',
-                          lineHeight: 1.85,
-                          fontWeight: 300,
-                          margin: 0,
-                          letterSpacing: '0.2px',
-                        }}>
-                          {step.body}
-                        </p>
-                      </div>
-                    </motion.div>
+                        {step.title}
+                      </h3>
+                      <p style={{
+                        fontSize: '0.82rem',
+                        color: 'rgba(30,20,10,0.55)',
+                        lineHeight: 1.75,
+                        fontWeight: 300,
+                        margin: 0,
+                      }}>
+                        {step.body}
+                      </p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            {/* Close button */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.6, rotate: -90 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.6 }}
-              transition={{ delay: 0.35, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => setOpen(false)}
-              whileHover={{ scale: 1.12, rotate: 90, borderColor: 'rgba(184,146,42,0.6)' }}
-              whileTap={{ scale: 0.9 }}
-              style={{
-                position: 'absolute',
-                top: 32,
-                right: 32,
-                width: 46,
-                height: 46,
-                borderRadius: '50%',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.6)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.3rem',
-                lineHeight: 1,
-                transition: 'border-color 0.3s',
-              }}
-            >
-              ×
-            </motion.button>
+            {/* Arrow pointing down to button */}
+            <div style={{
+              position: 'absolute',
+              bottom: -8,
+              left: 32,
+              width: 16,
+              height: 16,
+              background: 'rgba(255,251,242,0.97)',
+              border: '1px solid rgba(184,146,42,0.3)',
+              borderTop: 'none',
+              borderLeft: 'none',
+              transform: 'rotate(45deg)',
+            }} />
           </motion.div>
         )}
       </AnimatePresence>

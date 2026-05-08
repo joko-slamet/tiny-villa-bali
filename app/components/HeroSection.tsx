@@ -594,9 +594,23 @@ export default function HeroSection() {
             <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
               {images[current - 1].name}
             </motion.span>
-            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
+            <div style={{
+              width: 50, height: 50, borderRadius: '50%',
+              border: '1px solid rgba(28,21,16,0.12)',
+              background: 'linear-gradient(145deg, rgba(255,255,255,0.45) 0%, rgba(28,21,16,0.06) 100%)',
+              boxShadow: '4px 4px 10px rgba(28,21,16,0.14), -2px -2px 6px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                {/* drop shadow */}
+                <path d="M17,8 L8,8 L8,5 L3,10 L8,15 L8,12 L17,12 Z" fill="rgba(28,21,16,0.13)" transform="translate(1,1.2)"/>
+                {/* bottom/right face */}
+                <path d="M17,12 L18,13.2 L9,13.2 L9,15 L8,15 L8,12 Z" fill="rgba(28,21,16,0.28)"/>
+                <path d="M8,15 L9,16.2 L4,11.2 L3,10 L8,15 Z" fill="rgba(28,21,16,0.22)"/>
+                {/* front face */}
+                <path d="M17,8 L8,8 L8,5 L3,10 L8,15 L8,12 L17,12 Z" fill="rgba(28,21,16,0.62)"/>
+                {/* top-left highlight */}
+                <path d="M17,8 L8,8 L8,5 L3,10" stroke="rgba(255,255,255,0.35)" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </div>
           </motion.button>
@@ -614,12 +628,26 @@ export default function HeroSection() {
             onClick={() => navigate(1)}
             style={{ ...navBtnBase, right: 24, top: '50%', transform: 'none' }}
           >
-            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '1px solid rgba(28,21,16,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
+            <div style={{
+              width: 50, height: 50, borderRadius: '50%',
+              border: '1px solid rgba(28,21,16,0.12)',
+              background: 'linear-gradient(145deg, rgba(255,255,255,0.45) 0%, rgba(28,21,16,0.06) 100%)',
+              boxShadow: '4px 4px 10px rgba(28,21,16,0.14), -2px -2px 6px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                {/* drop shadow */}
+                <path d="M3,8 L12,8 L12,5 L17,10 L12,15 L12,12 L3,12 Z" fill="rgba(28,21,16,0.13)" transform="translate(1,1.2)"/>
+                {/* bottom/right face */}
+                <path d="M3,12 L4,13.2 L13,13.2 L13,15 L12,15 L12,12 Z" fill="rgba(28,21,16,0.28)"/>
+                <path d="M12,15 L13,16.2 L18,11.2 L17,10 L12,15 Z" fill="rgba(28,21,16,0.22)"/>
+                {/* front face */}
+                <path d="M3,8 L12,8 L12,5 L17,10 L12,15 L12,12 L3,12 Z" fill="rgba(28,21,16,0.62)"/>
+                {/* top-left highlight */}
+                <path d="M3,8 L12,8 L12,5 L17,10" stroke="rgba(255,255,255,0.35)" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </div>
-            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl' }}>
+            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
               {images[current + 1].name}
             </motion.span>
           </motion.button>
