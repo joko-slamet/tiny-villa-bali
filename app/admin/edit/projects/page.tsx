@@ -18,8 +18,8 @@ interface Project {
   status: string;
   units: string;
   available: boolean;
-
   src: string;
+  images: string[];
   slug: string;
   order: number;
 }
@@ -68,7 +68,7 @@ export default function AdminProjectsPage() {
     setConfirmDelete(null);
     setError(null);
     try {
-      const res = await deleteProjectAction(project.id, project.src);
+      const res = await deleteProjectAction(project.id, [project.src, ...(project.images ?? [])]);
       if (!res.success) throw new Error(res.error);
       setProjects((prev) => prev.filter((p) => p.id !== project.id));
       showSuccess(`"${project.name}" deleted.`);

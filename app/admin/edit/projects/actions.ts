@@ -92,15 +92,19 @@ export async function syncProjectsAction(payload: {
   }
 }
 
-export async function deleteProjectAction(id: string, imageSrc: string) {
+export async function deleteProjectAction(id: string, allImageUrls: string[]) {
   const supabase = adminClient();
 
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
 
-  if (imageSrc.includes("/storage/v1/object/public/project-images/")) {
-    const path = imageSrc.split("/project-images/")[1];
-    if (path) await supabase.storage.from("project-images").remove([path]);
+  const paths = allImageUrls
+    .filter((u) => u?.includes("/storage/v1/object/public/project-images/"))
+    .map((u) => u.split("/project-images/")[1])
+    .filter(Boolean);
+
+  if (paths.length > 0) {
+    await supabase.storage.from("project-images").remove(paths);
   }
 
   revalidatePath("/projects");

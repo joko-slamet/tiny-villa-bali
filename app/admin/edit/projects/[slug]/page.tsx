@@ -88,6 +88,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
   const galleryRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const supabase = createClient();
+  const savedUrls = useRef<{ src: string; images: string[] }>({ src: '', images: [] });
 
   useEffect(() => {
     if (typeof window !== "undefined") setBaseUrl(window.location.origin);
@@ -108,9 +109,11 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
         if (fallback) setForm(fallback);
         else setError("Project not found in database. Using empty form.");
       } else {
+        const loadedImages = data.images ?? [...EMPTY_IMAGES];
+        savedUrls.current = { src: data.src ?? '', images: loadedImages };
         setForm({
           ...EMPTY_FORM, ...data,
-          images:       data.images       ?? [...EMPTY_IMAGES],
+          images:       loadedImages,
           description1: data.description1 ?? "",
           description2: data.description2 ?? "",
           details1:     data.details1     ?? "",
@@ -170,10 +173,23 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
         })
       );
 
+      const urlsToDelete: string[] = [];
+      const isStorageUrl = (u: string) => u?.includes("/storage/v1/object/public/project-images/");
+
+      if (src !== savedUrls.current.src && isStorageUrl(savedUrls.current.src)) {
+        urlsToDelete.push(savedUrls.current.src);
+      }
+      savedUrls.current.images.forEach((oldUrl, i) => {
+        if (oldUrl && uploadedImages[i] !== oldUrl && isStorageUrl(oldUrl)) {
+          urlsToDelete.push(oldUrl);
+        }
+      });
+
       const payload = { ...form, src, images: uploadedImages };
-      const res = await syncProjectsAction({ idsToDelete: [], urlsToDelete: [], updatedProjects: [payload] });
+      const res = await syncProjectsAction({ idsToDelete: [], urlsToDelete, updatedProjects: [payload] });
       if (!res.success) throw new Error(res.error || "Save failed");
 
+      savedUrls.current = { src, images: uploadedImages };
       setToast(true);
       setTimeout(() => router.push("/admin/edit/projects"), 1500);
     } catch (err: any) {
