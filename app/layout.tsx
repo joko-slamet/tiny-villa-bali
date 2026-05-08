@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/Navigation";
+import PageTransition from "./components/PageTransition";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,9 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <Navigation />
-        <main style={{ paddingTop: "var(--nav-h)" }}>{children}</main>
+        <main style={{ paddingTop: "var(--nav-h)" }}>
+          <PageTransition>{children}</PageTransition>
+        </main>
       </body>
     </html>
   );

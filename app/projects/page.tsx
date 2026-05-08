@@ -173,12 +173,7 @@ export default function ProjectsPage() {
 
       {/* Project grid */}
       <div style={{ padding: "0 clamp(24px, 5vw, 80px) clamp(80px, 10vh, 120px)" }}>
-        {isLoading ? (
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 320 }}>
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              style={{ width: 36, height: 36, border: "3px solid var(--border)", borderTopColor: "var(--accent-1)", borderRadius: "50%" }} />
-          </div>
-        ) : (
+        {!isLoading && (
           <>
             {featured.length > 0 && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 12, marginBottom: 12 }}>

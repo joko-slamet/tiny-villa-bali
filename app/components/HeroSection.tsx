@@ -286,15 +286,7 @@ export default function HeroSection() {
   }
 
   if (isLoading || images.length === 0) {
-    return (
-      <div style={{ height: 'calc(100vh - var(--nav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#cec4b1' }}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ width: '40px', height: '40px', border: '4px solid rgba(0,0,0,0.1)', borderTopColor: '#b8922a', borderRadius: '50%' }}
-        />
-      </div>
-    )
+    return <div style={{ height: 'calc(100vh - var(--nav-h))', backgroundColor: '#cec4b1' }} />
   }
 
   return (

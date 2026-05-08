@@ -26,12 +26,6 @@ export default function Navigation() {
             <Link
               href={href}
               className={`nav-link ${pathname === href ? 'active' : ''}`}
-              transitionTypes={
-                links.findIndex(l => l.href === pathname) <
-                links.findIndex(l => l.href === href)
-                  ? ['nav-forward']
-                  : ['nav-back']
-              }
             >
               {label}
             </Link>

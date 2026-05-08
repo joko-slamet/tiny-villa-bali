@@ -69,20 +69,11 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── View Transition Keyframes ─────────────────────────── */
-@keyframes vt-slide-out-left  { to   { opacity: 0; transform: translateX(-32px); } }
-@keyframes vt-slide-in-right  { from { opacity: 0; transform: translateX(32px);  } }
-@keyframes vt-slide-out-right { to   { opacity: 0; transform: translateX(32px);  } }
-@keyframes vt-slide-in-left   { from { opacity: 0; transform: translateX(-32px); } }
-
-/* ─── View Transitions ───────────────────────────────────── */
-::view-transition-old(nav-forward)  { animation: 200ms ease-in  both         vt-slide-out-left;  }
-::view-transition-new(nav-forward)  { animation: 280ms ease-out 200ms both   vt-slide-in-right;  }
-::view-transition-old(nav-back)     { animation: 200ms ease-in  both         vt-slide-out-right; }
-::view-transition-new(nav-back)     { animation: 280ms ease-out 200ms both   vt-slide-in-left;   }
-::view-transition-group(site-nav)   { animation: none; z-index: 100; }
-::view-transition-old(site-nav)     { display: none; }
-::view-transition-new(site-nav)     { animation: none; }
+/* ─── View Transitions (disabled — page transitions handled by Framer Motion) ─ */
+::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+::view-transition-group(site-nav) { animation: none; z-index: 100; }
+::view-transition-old(site-nav)   { display: none; }
+::view-transition-new(site-nav)   { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {

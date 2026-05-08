@@ -351,12 +351,7 @@ export default function ProjectV2Page() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100svh", background: "var(--bg)" }}>
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ width: 40, height: 40, border: "3px solid rgba(184,146,42,0.2)", borderTopColor: "#b8922a", borderRadius: "50%" }} />
-      </div>
-    );
+    return <div style={{ height: "100svh", background: "var(--bg)" }} />;
   }
 
   return (
