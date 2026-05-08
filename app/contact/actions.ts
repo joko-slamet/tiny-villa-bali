@@ -5,7 +5,7 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const EMAIL_CONFIG = {
-  from: 'Tiny Villa Bali <no-reply@jokoslamet.id>',
+  from: 'no-reply@jokoslamet.id',
   to: 'jokoslamet2207@gmail.com',
 }
 
@@ -15,7 +15,7 @@ export async function sendContactEmail(data: {
   message: string
 }) {
   const { error } = await resend.emails.send({
-    from: EMAIL_CONFIG.from,
+    from: `${data.name} <${EMAIL_CONFIG.from}>`,
     to: EMAIL_CONFIG.to,
     replyTo: data.email,
     subject: `New message from ${data.name}`,
