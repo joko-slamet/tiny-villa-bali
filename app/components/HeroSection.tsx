@@ -12,6 +12,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import ProcessOfBuying from './ProcessOfBuying'
 
 interface HeroSlide {
   id: string;
@@ -306,6 +307,7 @@ export default function HeroSection() {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
       <div className="orb orb-1" style={{ opacity: 0.45 }} />
@@ -574,6 +576,8 @@ export default function HeroSection() {
           </div>
         </motion.div>
       </div>
+
+      <ProcessOfBuying />
 
       {/* Navigation arrows */}
       <AnimatePresence>
