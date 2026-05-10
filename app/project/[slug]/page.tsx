@@ -154,6 +154,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [rates, setRates] = useState<{ USD: number; AUD: number; EUR: number } | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -178,6 +179,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
     }
     fetchProject();
   }, [slug]);
+
+  useEffect(() => {
+    fetch("/api/currency")
+      .then(r => r.json())
+      .then(d => setRates(d))
+      .catch(() => {});
+  }, []);
 
   if (isLoading) {
     return (
@@ -290,17 +298,40 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
         {/* Price */}
         {project.price && (
           <Reveal>
-            <div style={{ display: "inline-flex", alignItems: "stretch", marginBottom: 48, borderRadius: 16, overflow: "hidden", border: "1px solid rgba(184,146,42,0.25)", boxShadow: "0 4px 32px rgba(184,146,42,0.08)" }}>
-              {/* Accent bar */}
-              <div style={{ width: 4, background: "linear-gradient(to bottom, #e8c870, #b8922a)", flexShrink: 0 }} />
-              <div style={{ padding: "20px 28px", background: "linear-gradient(135deg, rgba(184,146,42,0.07) 0%, transparent 100%)" }}>
-                <p style={{ fontSize: "0.85rem", fontWeight: 700, letterSpacing: "6px", textTransform: "uppercase", color: "var(--accent-1)", marginBottom: 8 }}>
-                  IDR
-                </p>
-                <p style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 200, letterSpacing: "3px", color: "var(--text)", lineHeight: 1 }}>
-                  {formatIDR(project.price)}
-                </p>
+            <div style={{ marginBottom: 48 }}>
+              <div style={{ display: "inline-flex", alignItems: "stretch", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(184,146,42,0.25)", boxShadow: "0 4px 32px rgba(184,146,42,0.08)" }}>
+                <div style={{ width: 4, background: "linear-gradient(to bottom, #e8c870, #b8922a)", flexShrink: 0 }} />
+                <div style={{ padding: "20px 28px", background: "linear-gradient(135deg, rgba(184,146,42,0.07) 0%, transparent 100%)" }}>
+                  <p style={{ fontSize: "0.85rem", fontWeight: 700, letterSpacing: "6px", textTransform: "uppercase", color: "var(--accent-1)", marginBottom: 8 }}>
+                    IDR
+                  </p>
+                  <p style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 200, letterSpacing: "3px", color: "var(--text)", lineHeight: 1 }}>
+                    {formatIDR(project.price)}
+                  </p>
+                </div>
               </div>
+
+              {rates && (() => {
+                const idr = parseInt(project.price!.replace(/\D/g, ""), 10);
+                if (isNaN(idr)) return null;
+                const conversions = [
+                  { label: "USD", symbol: "$",  value: idr * rates.USD },
+                  { label: "AUD", symbol: "A$", value: idr * rates.AUD },
+                  { label: "EUR", symbol: "€",  value: idr * rates.EUR },
+                ];
+                return (
+                  <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                    {conversions.map(({ label, symbol, value }) => (
+                      <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, background: "var(--surface)", border: "1px solid var(--border)" }}>
+                        <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "var(--muted-2)" }}>{label}</span>
+                        <span style={{ fontSize: "0.82rem", fontWeight: 500, color: "var(--text)" }}>
+                          {symbol}{Math.round(value).toLocaleString("en-US")}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </Reveal>
         )}
