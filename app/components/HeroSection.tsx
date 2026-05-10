@@ -381,91 +381,12 @@ export default function HeroSection() {
                       style={{ objectFit: 'cover', pointerEvents: 'none' }}
                       priority
                     />
-
-                    {/* Image Overlay: Status & Availability */}
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={`status-overlay-${current}`}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 5 }}
-                        transition={{ duration: 1.2, ease: "easeInOut", delay: 1.0 }}
-                        style={{
-                          position: 'absolute',
-                          top: 32,
-                          right: 32,
-                          zIndex: 30,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 6,
-                          color: 'rgba(28,21,16,0.85)',
-                          padding: '14px 20px',
-                          background: 'rgba(255,255,255,0.35)',
-                          backdropFilter: 'blur(12px)',
-                          borderRadius: 20,
-                          border: '1px solid rgba(255,255,255,0.45)',
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-                        }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 2 }}>
-                          <span style={{ fontSize: '0.6rem', opacity: 0.6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                            Project Status
-                          </span>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px' }}>
-                            {images[current].status}
-                          </span>
-                        </div>
-                        <div style={{ width: '100%', height: 1, background: 'rgba(28,21,16,0.08)', margin: '4px 0' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ 
-                            width: 6, height: 6, borderRadius: '50%', 
-                            background: images[current].available ? '#059669' : '#64748b'
-                          }} />
-                          <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.8 }}>
-                            {images[current].available ? 'Available' : 'Not Available'}
-                          </span>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
                   </motion.div>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
         </motion.div>
-
-        {/* Top-Left: Metadata */}
-        <div style={{ position: 'absolute', top: 32, left: 32, zIndex: 50 }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`meta-top-${current}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 1.4, ease: "easeInOut" }}
-              style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}
-            >
-              <div style={{ 
-                width: 36, height: 36, borderRadius: '50%', background: 'rgba(28,21,16,0.04)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(28,21,16,0.7)', marginBottom: 2 }}>
-                  {images[current].location}
-                </span>
-                <div style={{ display: 'flex', gap: 6, fontSize: '0.65rem', color: 'rgba(28,21,16,0.4)', fontWeight: 500 }}>
-                  <span style={{ opacity: 0.6 }}>Units :</span>
-                  <span>{images[current].units}</span>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
 
         {/* ── Title strip at bottom ── */}
         <motion.div
@@ -515,38 +436,6 @@ export default function HeroSection() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'start', gap: 24 }}>
             <div />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-              <AnimatePresence mode="wait">
-                <motion.h2
-                  key={`title-${current}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 1.4, ease: "easeInOut" }}
-                  style={{
-                    fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
-                    fontWeight: 200,
-                    letterSpacing: '14px',
-                    textTransform: 'uppercase',
-                    color: 'rgba(28,21,16,0.9)',
-                    margin: '0 0 10px 0',
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {images[current].name.split('').map((char, i) => (
-                    <motion.span
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + i * 0.03, duration: 0.8 }}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                </motion.h2>
-              </AnimatePresence>
-
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -561,7 +450,7 @@ export default function HeroSection() {
                     <line x1="9" y1="3" x2="9" y2="18"/>
                     <line x1="15" y1="6" x2="15" y2="21"/>
                   </svg>
-                  View Location
+                  View Locations
                 </Link>
               </motion.div>
             </div>

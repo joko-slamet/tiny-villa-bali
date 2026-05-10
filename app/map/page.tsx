@@ -74,21 +74,6 @@ function MapContent() {
           pointerEvents: "none",
         }}
       >
-        <motion.p
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease }}
-          style={{
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            letterSpacing: "4px",
-            textTransform: "uppercase",
-            color: "var(--muted-2)",
-            marginBottom: 8,
-          }}
-        >
-          Master Plan
-        </motion.p>
         <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

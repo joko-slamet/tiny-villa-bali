@@ -365,7 +365,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
         {/* CTA */}
         <Reveal delay={0.04}>
           <div style={{ marginTop: 56, display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <Link href="/contact" className="btn-primary" transitionTypes={["nav-forward"]}>Book a Stay</Link>
+            <Link href="/contact" className="btn-primary" transitionTypes={["nav-forward"]}>Get in Touch</Link>
             <Link href="/projects" className="btn-outline" transitionTypes={["nav-back"]}>← Back to Projects</Link>
           </div>
         </Reveal>
