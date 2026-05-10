@@ -21,6 +21,7 @@ interface ProjectForm {
   units: string;
   available: boolean;
   featured: boolean;
+  region: string;
   src: string;
   slug: string;
   order?: number;
@@ -33,15 +34,19 @@ interface ProjectForm {
   url_360a: string;
   url_360b: string;
   url_maps: string;
-  x: number | null;
-  y: number | null;
 }
 
 const EMPTY_IMAGES = ["", "", "", "", ""];
 
 const STATUS_OPTIONS = ["Completed", "Under Construction", "Coming Soon"];
 
-const FALLBACK_EXTRA = { images: [...EMPTY_IMAGES], description1: "", description2: "", details1: "", details2: "", price: "", url_360a: "", url_360b: "", url_maps: "", x: null, y: null };
+const REGION_OPTIONS = [
+  { value: "south", label: "South Bali" },
+  { value: "west",  label: "West Bali"  },
+  { value: "north", label: "North Bali" },
+];
+
+const FALLBACK_EXTRA = { region: "", images: [...EMPTY_IMAGES], description1: "", description2: "", details1: "", details2: "", price: "", url_360a: "", url_360b: "", url_maps: "" };
 
 const FALLBACK_DATA: Record<string, ProjectForm> = {
   "canggu-residence":  { ...FALLBACK_EXTRA, name: "Canggu Residence",  location: "Canggu, Bali",   status: "Completed",   units: "12 units · 1 bedroom", available: false, featured: true,  src: "/assets/images/1_bed_new.png",                  slug: "canggu-residence",  order: 1 },
@@ -53,10 +58,10 @@ const FALLBACK_DATA: Record<string, ProjectForm> = {
 };
 
 const EMPTY_FORM: ProjectForm = {
-  name: "", location: "", status: "Under Construction",
+  name: "", location: "", status: "Under Construction", region: "",
   units: "", available: false, featured: false, src: "", slug: "", images: [...EMPTY_IMAGES],
   description1: "", description2: "", details1: "", details2: "",
-  price: "", url_360a: "", url_360b: "", url_maps: "", x: null, y: null,
+  price: "", url_360a: "", url_360b: "", url_maps: "",
 };
 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
@@ -122,8 +127,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
           url_360a:     data.url_360a     ?? "",
           url_360b:     data.url_360b     ?? "",
           url_maps:     data.url_maps     ?? "",
-          x:            data.x            ?? null,
-          y:            data.y            ?? null,
+          region:       data.region       ?? "",
         });
       }
     } catch {
@@ -289,6 +293,25 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
                       </button>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" style={{ fontWeight: 600 }}>Region</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {REGION_OPTIONS.map((r) => (
+                    <button key={r.value} onClick={() => update("region", form.region === r.value ? "" : r.value)}
+                      style={{
+                        flex: 1, padding: "10px 4px", borderRadius: 10, border: "1px solid",
+                        borderColor: form.region === r.value ? "var(--accent-1)" : "var(--border-h)",
+                        background: form.region === r.value ? "rgba(184,146,42,0.1)" : "transparent",
+                        color: form.region === r.value ? "var(--accent-1)" : "var(--muted-2)",
+                        fontWeight: form.region === r.value ? 700 : 500,
+                        fontSize: "0.72rem", cursor: "pointer", transition: "all 0.2s",
+                      }}>
+                      {r.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -550,84 +573,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ slug: st
             </div>
           </Section>
 
-          {/* Section 7: Map Location */}
-          <Section icon={<MapPin size={18} />} title="Map Location">
-            <p style={{ fontSize: "0.82rem", color: "var(--muted-2)", marginBottom: 16, lineHeight: 1.6 }}>
-              Click on the map to place the marker. Fine-tune with the X / Y inputs below (values in %).
-            </p>
-            <div
-              style={{ position: "relative", borderRadius: 14, overflow: "hidden", cursor: "crosshair", border: "1px solid var(--border)", userSelect: "none" }}
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = Math.round(((e.clientX - rect.left) / rect.width)  * 1000) / 10;
-                const y = Math.round(((e.clientY - rect.top)  / rect.height) * 1000) / 10;
-                update("x", Math.min(100, Math.max(0, x)));
-                update("y", Math.min(100, Math.max(0, y)));
-              }}
-            >
-              <Image
-                src="/assets/images/map.png"
-                alt="Map"
-                width={2594}
-                height={1632}
-                style={{ display: "block", width: "100%", height: "auto", pointerEvents: "none" }}
-              />
-              {form.x !== null && form.y !== null && (
-                <div style={{
-                  position: "absolute",
-                  left: `${form.x}%`,
-                  top:  `${form.y}%`,
-                  transform: "translate(-50%, -100%)",
-                  pointerEvents: "none",
-                  zIndex: 10,
-                }}>
-                  <span style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    background: "rgba(184,146,42,0.25)",
-                    animation: "pulse-ring 2s ease-in-out infinite",
-                  }} />
-                  <svg width="28" height="38" viewBox="0 0 28 38" fill="none"
-                    style={{ filter: "drop-shadow(0 3px 8px rgba(184,146,42,0.55))", display: "block" }}>
-                    <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="#b8922a" />
-                    <circle cx="14" cy="13" r="5.5" fill="#fff" opacity="0.9" />
-                  </svg>
-                </div>
-              )}
-              {form.x === null && (
-                <div style={{
-                  position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none",
-                }}>
-                  <div style={{ background: "rgba(28,21,16,0.55)", backdropFilter: "blur(6px)", color: "#fff", borderRadius: 10, padding: "10px 18px", fontSize: "0.8rem", fontWeight: 600 }}>
-                    Click to place marker
-                  </div>
-                </div>
-              )}
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
-              <div className="form-group">
-                <label className="form-label" style={{ fontWeight: 600 }}>X (%)</label>
-                <input className="form-input" type="number" min={0} max={100} step={0.1}
-                  placeholder="e.g. 46"
-                  value={form.x ?? ""}
-                  onChange={(e) => update("x", e.target.value === "" ? null : Math.min(100, Math.max(0, parseFloat(e.target.value))))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label" style={{ fontWeight: 600 }}>Y (%)</label>
-                <input className="form-input" type="number" min={0} max={100} step={0.1}
-                  placeholder="e.g. 36"
-                  value={form.y ?? ""}
-                  onChange={(e) => update("y", e.target.value === "" ? null : Math.min(100, Math.max(0, parseFloat(e.target.value))))} />
-              </div>
-            </div>
-          </Section>
-
-          {/* Section 8: Visibility & Flags */}
+          {/* Section 7: Visibility & Flags */}
           <Section icon={<Info size={18} />} title="Visibility & Flags">
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
               {/* Featured toggle */}

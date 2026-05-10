@@ -18,11 +18,18 @@ interface Project {
   status: string;
   units: string;
   available: boolean;
+  region: string;
   src: string;
   images: string[];
   slug: string;
   order: number;
 }
+
+const REGION_LABELS: Record<string, string> = {
+  south: "South Bali",
+  west:  "West Bali",
+  north: "North Bali",
+};
 
 const statusColor: Record<string, { bg: string; text: string; dot: string }> = {
   Completed:    { bg: "rgba(5,150,105,0.08)",  text: "#059669", dot: "#059669"  },
@@ -237,6 +244,13 @@ export default function AdminProjectsPage() {
                           <span style={{ fontSize: "0.72rem", fontWeight: 700, color: sc.text, letterSpacing: "0.5px" }}>{project.status}</span>
                         </div>
 
+                        {project.region && REGION_LABELS[project.region] && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 99, background: "rgba(184,146,42,0.07)", border: "1px solid rgba(184,146,42,0.2)" }}>
+                            <MapPin size={11} color="#b8922a" />
+                            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#b8922a", letterSpacing: "0.5px" }}>{REGION_LABELS[project.region]}</span>
+                          </div>
+                        )}
+
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           {project.available ? (
                             <><Eye size={14} color="#059669" /><span style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 600 }}>Available</span></>
@@ -317,6 +331,12 @@ export default function AdminProjectsPage() {
                           <div style={{ width: 6, height: 6, borderRadius: "50%", background: sc.dot }} />
                           <span style={{ fontSize: "0.65rem", fontWeight: 700, color: sc.text, letterSpacing: "0.5px", textTransform: "uppercase" }}>{project.status}</span>
                         </div>
+                        {project.region && REGION_LABELS[project.region] && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 99, background: "rgba(184,146,42,0.15)", border: "1px solid rgba(184,146,42,0.3)", backdropFilter: "blur(4px)" }}>
+                            <MapPin size={10} color="#b8922a" />
+                            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#b8922a", letterSpacing: "0.5px", textTransform: "uppercase" }}>{REGION_LABELS[project.region]}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -336,7 +356,7 @@ export default function AdminProjectsPage() {
                           {project.available ? (
                             <><Eye size={14} color="#059669" /><span style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 700 }}>Available</span></>
                           ) : (
-                            <><EyeOff size={14} color="var(--muted)" /><span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Sold Out</span></>
+                            <><EyeOff size={14} color="var(--muted)" /><span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Not Available</span></>
                           )}
                         </div>
                       </div>

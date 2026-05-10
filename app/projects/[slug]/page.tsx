@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -101,7 +101,16 @@ function ProjectCard({ project, index, large = false }: { project: Project; inde
   );
 }
 
-export default function ProjectsPage() {
+const REGION_LABELS: Record<string, string> = {
+  south: "South Bali",
+  west:  "West Bali",
+  north: "North Bali",
+};
+
+export default function ProjectsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const regionLabel = REGION_LABELS[slug] ?? "Our Projects";
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
@@ -109,10 +118,16 @@ export default function ProjectsPage() {
   useEffect(() => {
     async function fetchProjects() {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("projects")
           .select("id, name, location, status, units, available, featured, src, slug, order")
           .order("order", { ascending: true });
+
+        if (REGION_LABELS[slug]) {
+          query = query.eq("region", slug);
+        }
+
+        const { data, error } = await query;
 
         if (error || !data || data.length === 0) {
           setProjects(FALLBACK);
@@ -126,7 +141,7 @@ export default function ProjectsPage() {
       }
     }
     fetchProjects();
-  }, []);
+  }, [slug]);
 
   const featured = projects.filter((p) => p.featured);
   const rest = projects.filter((p) => !p.featured);
@@ -138,7 +153,7 @@ export default function ProjectsPage() {
         <div className="orb orb-1" style={{ opacity: 0.35 }} />
         <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease }} style={{ position: "relative", zIndex: 1, maxWidth: 680 }}>
           <h1 style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)", fontWeight: 200, letterSpacing: "10px", textTransform: "uppercase", lineHeight: 1.05, color: "var(--text)", marginBottom: 20 }}>
-            Our Projects
+            {regionLabel} Projects
           </h1>
           <p style={{ fontSize: "0.95rem", lineHeight: 1.85, color: "var(--muted-2)", maxWidth: 560 }}>
             Tiny Villa Bali specializes in creating exquisite tiny villas that offer a unique blend of comfort and style. Our projects are designed to provide the perfect escape, ensuring an unforgettable experience for our guests. We pride ourselves on our attention to detail and commitment to quality, making sure every tiny villa is a cozy retreat that feels like home.
