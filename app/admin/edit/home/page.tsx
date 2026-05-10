@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Image as ImageIcon, Upload, Save, ArrowLeft, Type, MapPin, Info, Palette, CheckCircle2, Link as LinkIcon, Plus, Trash2, AlertCircle } from "lucide-react";
+import { Image as ImageIcon, Upload, Save, ArrowLeft, Palette, CheckCircle2, Link as LinkIcon, Plus, Trash2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -10,12 +10,7 @@ import { syncHeroSlidesAction } from "./actions";
 
 interface HeroSlide {
   id?: string;
-  name: string;
-  location: string;
-  status: string;
-  units: string;
   bg: string;
-  available: boolean;
   src: string;
   slug: string;
 }
@@ -23,22 +18,12 @@ interface HeroSlide {
 export default function EditHomePage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([
     // {
-    //   name: 'Canggu Residence',
-    //   location: 'Canggu, Bali',
-    //   status: 'Completed',
-    //   units: '12 (1 bedroom)',
     //   bg: '#cec4b1',
-    //   available: false,
     //   src: '/assets/images/1_bed_new.png',
     //   slug: 'canggu-residence'
     // },
     // {
-    //   name: 'Bingin Residence',
-    //   location: 'Bingin, Bali',
-    //   status: 'Completed',
-    //   units: '16 (1 bedroom)',
     //   bg: '#cebeaf',
-    //   available: false,
     //   src: '/assets/images/2_bed_new.png',
     //   slug: 'bingin-residence'
     // }
@@ -46,7 +31,7 @@ export default function EditHomePage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [baseUrl, setBaseUrl] = useState("https://yourdomain.com");
+  const [baseUrl, setBaseUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletedSlides, setDeletedSlides] = useState<HeroSlide[]>([]);
@@ -106,12 +91,7 @@ export default function EditHomePage() {
 
   const handleAddSlide = () => {
     setHeroSlides([...heroSlides, {
-      name: 'New Project',
-      location: 'Location, Bali',
-      status: 'In Progress',
-      units: '0',
       bg: '#ffffff',
-      available: true,
       src: '',
       slug: `new-project-${Date.now()}`
     }]);
@@ -172,13 +152,10 @@ export default function EditHomePage() {
         
         // Only upload if it's a new local image (data URL or blob URL)
         if (imageUrl.startsWith('data:image') || imageUrl.startsWith('blob:')) {
-          console.log(`Uploading new image for slide: ${slide.name}`);
           const res = await fetch(imageUrl);
           const blob = await res.blob();
           const file = new File([blob], `slide-${index}.png`, { type: 'image/png' });
           imageUrl = await uploadImage(file);
-        } else {
-          console.log(`Using existing image for slide: ${slide.name}`);
         }
         
         const { id, ...slideData } = slide;
@@ -292,7 +269,7 @@ export default function EditHomePage() {
                       <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: 'rgba(184,146,42,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-1)' }}>
                         <ImageIcon size={20} />
                       </div>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{slide.name || `Slide ${index + 1}`}</h3>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{`Slide ${index + 1}`}</h3>
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -338,7 +315,7 @@ export default function EditHomePage() {
                         }}
                       >
                         {slide.src ? (
-                          <Image src={slide.src} alt={slide.name} fill style={{ objectFit: 'cover' }} />
+                          <Image src={slide.src} alt="Villa" fill style={{ objectFit: 'cover' }} />
                         ) : (
                           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', backgroundColor: 'var(--surface)', color: 'var(--muted-2)' }}>
                             <ImageIcon size={36} strokeWidth={1.2} />
@@ -393,98 +370,25 @@ export default function EditHomePage() {
 
                     {/* Right Column: Text Data */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                        <div className="form-group">
-                          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Type size={14} /> Project Name
-                          </label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            value={slide.name} 
-                            onChange={(e) => handleHeroChange(index, 'name', e.target.value)}
+                      <div className="form-group">
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Palette size={14} /> Background Color
+                        </label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <input
+                            type="color"
+                            className="form-input"
+                            style={{ width: '45px', padding: '4px', height: '42px' }}
+                            value={slide.bg}
+                            onChange={(e) => handleHeroChange(index, 'bg', e.target.value)}
                           />
-                        </div>
-                        <div className="form-group">
-                          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <MapPin size={14} /> Location
-                          </label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            value={slide.location} 
-                            onChange={(e) => handleHeroChange(index, 'location', e.target.value)}
+                          <input
+                            type="text"
+                            className="form-input"
+                            value={slide.bg}
+                            onChange={(e) => handleHeroChange(index, 'bg', e.target.value)}
+                            placeholder="#FFFFFF"
                           />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                        <div className="form-group">
-                          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Info size={14} /> Status
-                          </label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            value={slide.status} 
-                            onChange={(e) => handleHeroChange(index, 'status', e.target.value)}
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Info size={14} /> Units
-                          </label>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            value={slide.units} 
-                            onChange={(e) => handleHeroChange(index, 'units', e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px', alignItems: 'flex-end' }}>
-                        <div className="form-group">
-                          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Palette size={14} /> Background Color
-                          </label>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <input 
-                              type="color" 
-                              className="form-input" 
-                              style={{ width: '45px', padding: '4px', height: '42px' }}
-                              value={slide.bg} 
-                              onChange={(e) => handleHeroChange(index, 'bg', e.target.value)}
-                            />
-                            <input 
-                              type="text" 
-                              className="form-input" 
-                              value={slide.bg} 
-                              onChange={(e) => handleHeroChange(index, 'bg', e.target.value)}
-                              placeholder="#FFFFFF"
-                            />
-                          </div>
-                        </div>
-                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
-                            <div 
-                              onClick={() => handleHeroChange(index, 'available', !slide.available)}
-                              style={{ 
-                                width: '20px', 
-                                height: '20px', 
-                                borderRadius: '6px', 
-                                border: `2px solid ${slide.available ? 'var(--accent-1)' : 'var(--border-h)'}`,
-                                backgroundColor: slide.available ? 'var(--accent-1)' : 'transparent',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'all 0.2s'
-                              }}
-                            >
-                              {slide.available && <CheckCircle2 size={14} color="white" />}
-                            </div>
-                            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Available for Sale</span>
-                          </label>
                         </div>
                       </div>
 

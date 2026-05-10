@@ -16,12 +16,7 @@ import ProcessOfBuying from './ProcessOfBuying'
 
 interface HeroSlide {
   id: string;
-  name: string;
-  location: string;
-  status: string;
-  units: string;
   bg: string;
-  available: boolean;
   src: string;
   slug: string;
   order: number;
@@ -79,8 +74,8 @@ export default function HeroSection() {
         setImages(data)
       } else {
         setImages([
-          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', name: 'Canggu Residence', status: 'Completed', units: '12 (1 bedroom)', location: 'Canggu, Bali', available: false, slug: 'canggu-residence', order: 1 },
-          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', name: 'Bingin Residence',  status: 'Completed', units: '16 (1 bedroom)', location: 'Bingin, Bali',  available: false, slug: 'bingin-residence',  order: 2 },
+          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', slug: 'canggu-residence', order: 1 },
+          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', slug: 'bingin-residence',  order: 2 },
         ])
       }
     } catch (err) {
@@ -152,16 +147,6 @@ export default function HeroSection() {
     padding: '20px 10px',
   }
 
-  const verticalLabelStyle: React.CSSProperties = {
-    writingMode: 'vertical-rl',
-    transform: 'rotate(180deg)',
-    fontSize: '0.8rem',
-    fontWeight: 800,
-    letterSpacing: '4px',
-    textTransform: 'uppercase',
-    opacity: 0.8,
-    whiteSpace: 'nowrap',
-  }
 
   if (isLoading || images.length === 0) {
     return <div style={{ height: 'calc(100vh - var(--nav-h))', backgroundColor: '#cec4b1' }} />
@@ -235,7 +220,7 @@ export default function HeroSection() {
                 >
                   <Image
                     src={images[current].src}
-                    alt={images[current].name}
+                    alt="Villa"
                     fill
                     style={{ objectFit: 'cover', pointerEvents: 'none' }}
                     priority
@@ -286,9 +271,6 @@ export default function HeroSection() {
             onClick={() => navigate(-1)}
             style={{ ...navBtnBase, left: 24, bottom: '50%', top: 'auto', transform: 'none' }}
           >
-            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-              {images[current - 1].name}
-            </motion.span>
             <div style={{
               width: 50, height: 50, borderRadius: '50%',
               border: '1px solid rgba(28,21,16,0.12)',
@@ -334,9 +316,6 @@ export default function HeroSection() {
                 <path d="M3,8 L12,8 L12,5 L17,10" stroke="rgba(255,255,255,0.35)" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </div>
-            <motion.span style={{ ...verticalLabelStyle, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-              {images[current + 1].name}
-            </motion.span>
           </motion.button>
         )}
       </AnimatePresence>
