@@ -21,15 +21,6 @@ interface Project {
   order: number;
 }
 
-const FALLBACK: Project[] = [
-  { id: "1", name: "Canggu Residence",  location: "Canggu, Bali",   status: "Completed",          units: "12 units · 1 bedroom", available: false, featured: true,  src: "/assets/images/1_bed_new.png",                  slug: "canggu-residence",  order: 1 },
-  { id: "2", name: "Bingin Residence",  location: "Bingin, Bali",   status: "Completed",          units: "16 units · 1 bedroom", available: true,  featured: true,  src: "/assets/images/binging/bingin-pool.png",        slug: "binging-residence", order: 2 },
-  { id: "3", name: "Seminyak Villas",   location: "Seminyak, Bali", status: "Under Construction", units: "8 units · 2 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-bedroom.png",     slug: "seminyak-villas",   order: 3 },
-  { id: "4", name: "Ubud Retreat",      location: "Ubud, Bali",     status: "Coming Soon",        units: "6 units · 3 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-living-room.png", slug: "ubud-retreat",      order: 4 },
-  { id: "5", name: "Jimbaran Estate",   location: "Jimbaran, Bali", status: "Coming Soon",        units: "4 units · 4 bedroom",  available: false, featured: false, src: "/assets/images/binging/bingin-kitchen.png",     slug: "jimbaran-estate",   order: 5 },
-  { id: "6", name: "Uluwatu Cliff",     location: "Uluwatu, Bali",  status: "Under Construction", units: "10 units · 2 bedroom", available: false, featured: false, src: "/assets/images/binging/bingin-parking.png",     slug: "uluwatu-cliff",     order: 6 },
-];
-
 const statusColor: Record<string, string> = {
   Completed: "#059669",
   "Under Construction": "#b8922a",
@@ -129,13 +120,11 @@ export default function ProjectsPage({ params }: { params: Promise<{ slug: strin
 
         const { data, error } = await query;
 
-        if (error || !data || data.length === 0) {
-          setProjects(FALLBACK);
-        } else {
+        if (!error && data) {
           setProjects(data as Project[]);
         }
       } catch {
-        setProjects(FALLBACK);
+        // no-op
       } finally {
         setIsLoading(false);
       }
@@ -183,7 +172,13 @@ export default function ProjectsPage({ params }: { params: Promise<{ slug: strin
 
       {/* Project grid */}
       <div style={{ padding: "0 clamp(24px, 5vw, 80px) clamp(80px, 10vh, 120px)" }}>
-        {!isLoading && (
+        {!isLoading && projects.length === 0 && (
+          <div style={{ textAlign: "center", padding: "80px 24px", color: "var(--muted-2)", border: "1px dashed var(--border-h)", borderRadius: 20 }}>
+            <p style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 8 }}>No projects yet</p>
+            <p style={{ fontSize: "0.85rem" }}>Projects in this region will appear here.</p>
+          </div>
+        )}
+        {!isLoading && projects.length > 0 && (
           <>
             {featured.length > 0 && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 12, marginBottom: 12 }}>
