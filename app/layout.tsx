@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Tiny Villa Bali - Modern Tropical villas",
-  description:
-    "Modern Tropical villas designed for tropical living",
+  description: "Modern Tropical villas designed for tropical living",
+  icons: { icon: "/assets/icons/logo.png" },
 };
 
 export default function RootLayout({
