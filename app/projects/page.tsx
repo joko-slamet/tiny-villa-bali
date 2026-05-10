@@ -121,6 +121,7 @@ function MapContent() {
               width: "100%",
               height: "auto",
               borderRadius: 14,
+              filter: "drop-shadow(0 12px 40px rgba(0,0,0,0.38)) drop-shadow(0 3px 10px rgba(0,0,0,0.22))",
             }}
             priority
           />
