@@ -78,12 +78,6 @@ function ProjectCard({ project, index, large = false }: { project: Project; inde
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 22px 22px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
               <p style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: "#e8c870" }}>{project.location}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: project.available ? "#059669" : "#64748b" }} />
-                <span style={{ fontSize: "0.58rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", color: project.available ? "rgba(5,150,105,0.9)" : "rgba(255,255,255,0.35)" }}>
-                  {project.available ? "Available" : "Not Available"}
-                </span>
-              </div>
             </div>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
               <h3 style={{ fontSize: large ? "clamp(1.5rem, 3vw, 2.2rem)" : "clamp(1.1rem, 2vw, 1.5rem)", fontWeight: 200, letterSpacing: large ? "8px" : "5px", textTransform: "uppercase", color: "#fff", lineHeight: 1.1 }}>
@@ -154,18 +148,19 @@ export default function ProjectsPage() {
 
       {/* Stats strip */}
       <Reveal>
-        <div style={{ margin: "0 clamp(24px, 5vw, 80px)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--border)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden", marginBottom: "clamp(40px, 5vh, 64px)" }}>
+        <div style={{ margin: "0 clamp(24px, 5vw, 80px) clamp(40px, 5vh, 64px)", display: "flex", border: "1px solid var(--border)", borderRadius: 20, overflow: "hidden" }}>
           {[
-            { value: `${projects.length}`, label: "Total Projects" },
-            { value: `${projects.filter((p) => p.status === "Completed").length}`, label: "Completed" },
-            { value: `${projects.filter((p) => p.available).length}`, label: "Available" },
-            { value: `${new Set(projects.map((p) => p.location.split(",")[0].trim())).size || 0}`, label: "Locations" },
-          ].map(({ value, label }) => (
-            <div key={label} style={{ padding: "28px 24px", background: "var(--bg)", textAlign: "center" }}>
-              <div className="gradient-text" style={{ fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 4 }}>
+            { value: `${projects.length}`, label: "Total Projects", accent: true },
+            { value: `${projects.filter((p) => p.status === "Under Construction").length}`, label: "Under Construction", accent: false },
+          ].map(({ value, label, accent }, i) => (
+            <div key={label} style={{ flex: 1, padding: "44px 32px", background: "var(--bg)", textAlign: "center", borderLeft: i > 0 ? "1px solid var(--border)" : "none", position: "relative", overflow: "hidden" }}>
+              {accent && (
+                <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 2, background: "linear-gradient(to right, #e8c870, #b8922a)", borderRadius: 99 }} />
+              )}
+              <div className="gradient-text" style={{ fontSize: "clamp(2.4rem, 4vw, 3.6rem)", fontWeight: 800, letterSpacing: "-2px", lineHeight: 1, marginBottom: 10 }}>
                 {isLoading ? "—" : value}
               </div>
-              <div style={{ fontSize: "0.68rem", color: "var(--muted-2)", letterSpacing: "1.5px", textTransform: "uppercase" }}>{label}</div>
+              <div style={{ fontSize: "0.62rem", color: "var(--muted-2)", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 600 }}>{label}</div>
             </div>
           ))}
         </div>
