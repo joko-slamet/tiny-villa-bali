@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -21,8 +20,6 @@ interface Marker {
 function MapContent() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
-  const searchParams = useSearchParams();
-  const locationFilter = searchParams.get("location");
   const supabase = createClient();
 
   useEffect(() => {
@@ -35,10 +32,6 @@ function MapContent() {
           .not("y", "is", null)
           .order("order", { ascending: true });
 
-        if (locationFilter) {
-          query = query.eq("slug", locationFilter);
-        }
-
         const { data, error } = await query;
 
         if (!error && data && data.length > 0) {
@@ -49,7 +42,7 @@ function MapContent() {
       }
     }
     fetchMarkers();
-  }, [locationFilter]);
+  }, []);
 
   return (
     <motion.section
