@@ -59,6 +59,8 @@ export default function HeroSection() {
     clickSound.current = new Audio('/assets/audio/click.wav')
     clickSound.current.volume = 0.5
     clickSound.current.load()
+
+    return () => {}
   }, [])
 
   const fetchSlides = async () => {
@@ -74,8 +76,8 @@ export default function HeroSection() {
         setImages(data)
       } else {
         setImages([
-          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', title: 'Canggu Residence', order: 1 },
-          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', title: 'Bingin Residence',  order: 2 },
+          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', title: '1 Bedroom', order: 1 },
+          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', title: '2 Bedroom',  order: 2 },
         ])
       }
     } catch (err) {
@@ -199,31 +201,10 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                style={{
-                  position: 'absolute',
-                  top: 18,
-                  right: 20,
-                  zIndex: 20,
-                  pointerEvents: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '6px 12px 6px 8px',
-                  borderRadius: 99,
-                  background: 'rgba(255,252,248,0.82)',
-                  backdropFilter: 'blur(14px)',
-                  border: '1px solid rgba(184,146,42,0.3)',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
-                }}
+                style={{ position: 'absolute', top: 4, right: 20, zIndex: 20, pointerEvents: 'none', width: 'fit-content', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px 6px 8px', borderRadius: 99, background: 'rgba(255,252,248,0.82)', backdropFilter: 'blur(14px)', border: '1px solid rgba(184,146,42,0.3)', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' }}
               >
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'linear-gradient(135deg, #e8c870, #b8922a)', flexShrink: 0 }} />
-                <span style={{
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  letterSpacing: '2.5px',
-                  textTransform: 'uppercase',
-                  color: 'rgba(28,21,16,0.8)',
-                }}>
+                <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: '0.9rem', fontWeight: 600, fontStyle: 'italic', letterSpacing: '1.5px', color: 'rgba(28,21,16,0.85)' }}>
                   {images[current].title}
                 </span>
               </motion.div>
