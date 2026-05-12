@@ -20,7 +20,7 @@ export default function ContactPage() {
       style={{
         minHeight: 'calc(100vh - var(--nav-h))',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
         gap: 0,
       }}
     >
@@ -31,7 +31,6 @@ export default function ContactPage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          borderRight: '1px solid var(--border)',
         }}
       >
         <ScrollReveal>

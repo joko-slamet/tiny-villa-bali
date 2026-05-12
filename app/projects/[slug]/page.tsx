@@ -178,12 +178,12 @@ export default function ProjectsPage({ params }: { params: Promise<{ slug: strin
         {!isLoading && projects.length > 0 && (
           <>
             {featured.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 12, marginBottom: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))", gap: 12, marginBottom: 12 }}>
                 {featured.map((p, i) => <ProjectCard key={p.slug} project={p} index={i} large />)}
               </div>
             )}
             {rest.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 12 }}>
                 {rest.map((p, i) => <ProjectCard key={p.slug} project={p} index={featured.length + i} />)}
               </div>
             )}

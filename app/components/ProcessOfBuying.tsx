@@ -49,8 +49,8 @@ export default function ProcessOfBuying() {
         whileTap={{ scale: 0.95 }}
         style={{
           position: 'absolute',
-          bottom: 40,
-          left: 40,
+          bottom: 'clamp(16px, 4vw, 40px)',
+          left: 'clamp(16px, 4vw, 40px)',
           zIndex: 20,
           display: 'flex',
           alignItems: 'center',
@@ -131,9 +131,9 @@ export default function ProcessOfBuying() {
             onClick={e => e.stopPropagation()}
             style={{
               position: 'fixed',
-              bottom: 116,
-              left: 40,
-              width: 400,
+              bottom: 'clamp(100px, 14vw, 116px)',
+              left: 'clamp(16px, 4vw, 40px)',
+              width: 'min(calc(100vw - 32px), 400px)',
               zIndex: 9999,
               background: 'rgba(255,251,242,0.97)',
               backdropFilter: 'blur(24px)',

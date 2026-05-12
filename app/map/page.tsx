@@ -61,12 +61,12 @@ export default function MapPage() {
       transition={{ duration: 0.6 }}
       style={{ height: "calc(100vh - var(--nav-h))", width: "100%", position: "relative", background: "var(--bg)", overflow: "hidden" }}
     >
-      <div style={{ position: "absolute", top: 40, left: 40, zIndex: 50, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", top: "clamp(20px, 4vw, 40px)", left: "clamp(16px, 4vw, 40px)", zIndex: 50, pointerEvents: "none" }}>
         <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease }}
-          style={{ fontSize: "3.5rem", fontWeight: 800, letterSpacing: "-2px", color: "var(--text)", margin: 0 }}
+          style={{ fontSize: "clamp(1.8rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-2px", color: "var(--text)", margin: 0 }}
         >
           Project Map
         </motion.h1>

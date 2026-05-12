@@ -130,7 +130,7 @@ function Lightbox({ images, index, onClose, onNav }: { images: string[]; index: 
 }
 
 function navBtn(side: "left" | "right"): React.CSSProperties {
-  return { position: "absolute", top: "50%", transform: "translateY(-50%)", [side]: -60, width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" };
+  return { position: "absolute", top: "50%", transform: "translateY(-50%)", [side]: 12, width: 44, height: 44, borderRadius: "50%", background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" };
 }
 
 function formatIDR(raw: string): string {
@@ -231,7 +231,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
             </Reveal>
 
             {landscape.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(${landscape.length}, 1fr)`, gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 8 }}>
                 {landscape.map((src, i) => (
                   <Reveal key={i} delay={i * 0.06}>
                     <div style={{ width: "100%", aspectRatio: "4/3", borderRadius: 12, overflow: "hidden" }}>
@@ -243,7 +243,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
             )}
 
             {portrait.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(${portrait.length}, 1fr)`, gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(200px, 100%), 1fr))", gap: 8 }}>
                 {portrait.map((src, i) => (
                   <Reveal key={i} delay={i * 0.06}>
                     <div style={{ width: "100%", aspectRatio: "3/4", borderRadius: 12, overflow: "hidden" }}>
@@ -264,7 +264,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
             <Reveal>
               <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "4px", textTransform: "uppercase", color: "var(--muted-2)", marginBottom: 14 }}>360° Virtual Tour</p>
             </Reveal>
-            <div style={{ display: "grid", gridTemplateColumns: project.url_360a && project.url_360b ? "1fr 1fr" : "1fr", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: project.url_360a && project.url_360b ? "repeat(auto-fit, minmax(min(280px, 100%), 1fr))" : "1fr", gap: 8 }}>
               {([project.url_360a, project.url_360b] as (string | null)[]).filter(Boolean).map((url, i) => (
                 <Reveal key={i} delay={i * 0.06}>
                   <a href={url!} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>
@@ -357,7 +357,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
 
         {/* Description 2 + Details grid */}
         {(project.description2 || project.details1 || project.details2) && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px 48px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))", gap: "32px 48px" }}>
             {project.description2 && (
               <Reveal delay={0.0}>
                 <p style={{ fontSize: "0.92rem", lineHeight: 1.85, color: "var(--muted-2)" }}>{project.description2}</p>

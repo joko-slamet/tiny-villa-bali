@@ -155,7 +155,7 @@ export default function MapPage() {
                           whiteSpace: "nowrap",
                           pointerEvents: "none",
                           boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
-                          minWidth: 220,
+                          minWidth: "min(220px, calc(100vw - 48px))",
                         }}
                       >
                         <div style={{ height: 3, background: "linear-gradient(to right, #e8c870, #b8922a)" }} />
