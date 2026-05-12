@@ -9,9 +9,9 @@ import { createClient } from "@/lib/supabase/client";
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const REGIONS = [
-  { id: "north", label: "North Bali Projects", x: 70, y: 43, yMobile: 43 },
-  { id: "west",  label: "West Bali Projects",  x: 52, y: 54, yMobile: 54 },
-  { id: "south", label: "South Bali Projects", x: 55, y: 74, yMobile: 70 },
+  { id: "north", label: "North Bali Projects", x: 70, y: 43, yMobile: 40 },
+  { id: "west",  label: "West Bali Projects",  x: 52, y: 54, yMobile: 52 },
+  { id: "south", label: "South Bali Projects", x: 55, y: 74, yMobile: 64 },
 ];
 
 type RegionId = typeof REGIONS[number]["id"];

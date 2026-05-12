@@ -201,7 +201,7 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                style={{ position: 'absolute', top: 4, right: 20, zIndex: 20, pointerEvents: 'none', width: 'fit-content', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px 6px 8px', borderRadius: 99, background: 'rgba(255,252,248,0.82)', backdropFilter: 'blur(14px)', border: '1px solid rgba(184,146,42,0.3)', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' }}
+                style={{ position: 'absolute', top: -30, right: 20, zIndex: 20, pointerEvents: 'none', width: 'fit-content', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px 6px 8px', borderRadius: 99, background: 'rgba(255,252,248,0.82)', backdropFilter: 'blur(14px)', border: '1px solid rgba(184,146,42,0.3)', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' }}
               >
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'linear-gradient(135deg, #e8c870, #b8922a)', flexShrink: 0 }} />
                 <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: '0.9rem', fontWeight: 600, fontStyle: 'italic', letterSpacing: '1.5px', color: 'rgba(28,21,16,0.85)' }}>
