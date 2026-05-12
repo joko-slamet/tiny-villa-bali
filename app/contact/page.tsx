@@ -3,7 +3,7 @@ import ContactForm from '../components/ContactForm'
 import ScrollReveal from '../components/ScrollReveal'
 
 export const metadata: Metadata = {
-  title: 'Contact — Animate Mbuchacher',
+  title: 'Contact — Tiny Villa Bali',
   description: 'Get in touch with us for business proposals, project enquiries, or purchasing information.',
 }
 

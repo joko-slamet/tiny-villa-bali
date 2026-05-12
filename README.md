@@ -1,6 +1,6 @@
-# Animate Mbuchacher
+# Tiny Villa Bali
 
-Website portofolio dengan animasi berbasis Next.js, Supabase, dan Resend.
+Website Tiny Villa Bali berbasis Next.js, Supabase, dan Resend.
 
 ## Prasyarat
 
