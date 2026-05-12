@@ -325,7 +325,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
                       <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, background: "var(--surface)", border: "1px solid var(--border)" }}>
                         <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "var(--muted-2)" }}>{label}</span>
                         <span style={{ fontSize: "0.82rem", fontWeight: 500, color: "var(--text)" }}>
-                          {symbol}{Math.round(value).toLocaleString("en-US")}
+                          ~{symbol}{Math.round(value).toLocaleString("en-US")}
                         </span>
                       </div>
                     ))}

@@ -158,9 +158,6 @@ export default function ProjectsPage({ params }: { params: Promise<{ slug: strin
             { value: `${projects.filter((p) => p.status === "Under Construction").length}`, label: "Under Construction", accent: false },
           ].map(({ value, label, accent }, i) => (
             <div key={label} style={{ flex: 1, padding: "44px 32px", background: "var(--bg)", textAlign: "center", borderLeft: i > 0 ? "1px solid var(--border)" : "none", position: "relative", overflow: "hidden" }}>
-              {accent && (
-                <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 48, height: 2, background: "linear-gradient(to right, #e8c870, #b8922a)", borderRadius: 99 }} />
-              )}
               <div className="gradient-text" style={{ fontSize: "clamp(2.4rem, 4vw, 3.6rem)", fontWeight: 800, letterSpacing: "-2px", lineHeight: 1, marginBottom: 10 }}>
                 {isLoading ? "—" : value}
               </div>

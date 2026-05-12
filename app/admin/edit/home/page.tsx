@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Image as ImageIcon, Upload, Save, ArrowLeft, Palette, CheckCircle2, Link as LinkIcon, Plus, Trash2, AlertCircle } from "lucide-react";
+import { Image as ImageIcon, Upload, Save, ArrowLeft, Palette, CheckCircle2, Plus, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +12,7 @@ interface HeroSlide {
   id?: string;
   bg: string;
   src: string;
-  slug: string;
+  title: string;
 }
 
 export default function EditHomePage() {
@@ -31,7 +31,6 @@ export default function EditHomePage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [baseUrl, setBaseUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletedSlides, setDeletedSlides] = useState<HeroSlide[]>([]);
@@ -40,9 +39,6 @@ export default function EditHomePage() {
   const supabase = createClient();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
-    }
     fetchData();
   }, []);
 
@@ -93,7 +89,7 @@ export default function EditHomePage() {
     setHeroSlides([...heroSlides, {
       bg: '#ffffff',
       src: '',
-      slug: `new-project-${Date.now()}`
+      title: ''
     }]);
   };
 
@@ -136,13 +132,6 @@ export default function EditHomePage() {
   };
 
   const handleSave = async () => {
-    const slugs = heroSlides.map(s => s.slug);
-    const duplicateSlugs = slugs.filter((s, i) => slugs.indexOf(s) !== i);
-    if (duplicateSlugs.length > 0) {
-      setError(`Duplicate URL slug detected: "${duplicateSlugs[0]}". Each slide must have a unique slug.`);
-      return;
-    }
-
     setIsSaving(true);
     setError(null);
     
@@ -158,18 +147,17 @@ export default function EditHomePage() {
           imageUrl = await uploadImage(file);
         }
         
-        const { id, ...slideData } = slide;
         const cleanedSlide: any = {
-          ...slideData,
+          bg: slide.bg,
+          title: slide.title,
           src: imageUrl,
-          order: index + 1
+          order: index + 1,
         };
-        
-        // Only include ID if it actually exists and is not an empty string
-        if (id && id !== "") {
-          cleanedSlide.id = id;
+
+        if (slide.id && slide.id !== "") {
+          cleanedSlide.id = slide.id;
         }
-        
+
         return cleanedSlide;
       }));
 
@@ -371,6 +359,17 @@ export default function EditHomePage() {
                     {/* Right Column: Text Data */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                       <div className="form-group">
+                        <label className="form-label">Title</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={slide.title}
+                          onChange={(e) => handleHeroChange(index, 'title', e.target.value)}
+                          placeholder="e.g. Canggu Residence"
+                        />
+                      </div>
+
+                      <div className="form-group">
                         <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <Palette size={14} /> Background Color
                         </label>
@@ -388,24 +387,6 @@ export default function EditHomePage() {
                             value={slide.bg}
                             onChange={(e) => handleHeroChange(index, 'bg', e.target.value)}
                             placeholder="#FFFFFF"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <LinkIcon size={14} /> URL Location
-                        </label>
-                        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--surface)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border)' }}>
-                          <span style={{ padding: '12px 16px', backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--muted-2)', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRight: '1px solid var(--border)' }}>
-                            {baseUrl}/map?location=
-                          </span>
-                          <input 
-                            type="text" 
-                            className="form-input" 
-                            style={{ border: 'none', background: 'transparent', boxShadow: 'none' }}
-                            value={slide.slug} 
-                            onChange={(e) => handleHeroChange(index, 'slug', e.target.value)}
                           />
                         </div>
                       </div>
@@ -461,12 +442,8 @@ export default function EditHomePage() {
               disabled={isSaving}
             >
               {isSaving ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <Save size={18} style={{ opacity: 0.5 }} />
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} style={{ display: 'flex' }}>
+                  <Loader2 size={18} />
                 </motion.div>
               ) : (
                 <Save size={18} />

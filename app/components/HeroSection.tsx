@@ -18,7 +18,7 @@ interface HeroSlide {
   id: string;
   bg: string;
   src: string;
-  slug: string;
+  title: string;
   order: number;
 }
 
@@ -74,8 +74,8 @@ export default function HeroSection() {
         setImages(data)
       } else {
         setImages([
-          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', slug: 'canggu-residence', order: 1 },
-          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', slug: 'bingin-residence',  order: 2 },
+          { id: '1', src: '/assets/images/1_bed_new.png', bg: '#cec4b1', title: 'Canggu Residence', order: 1 },
+          { id: '2', src: '/assets/images/2_bed_new.png', bg: '#cebeaf', title: 'Bingin Residence',  order: 2 },
         ])
       }
     } catch (err) {
@@ -192,6 +192,43 @@ export default function HeroSection() {
               borderRadius: 28,
             }}
           >
+            <AnimatePresence initial={false} mode="wait">
+              <motion.div
+                key={`title-${images[current].id}`}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  position: 'absolute',
+                  top: 18,
+                  right: 20,
+                  zIndex: 20,
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '6px 12px 6px 8px',
+                  borderRadius: 99,
+                  background: 'rgba(255,252,248,0.82)',
+                  backdropFilter: 'blur(14px)',
+                  border: '1px solid rgba(184,146,42,0.3)',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+                }}
+              >
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'linear-gradient(135deg, #e8c870, #b8922a)', flexShrink: 0 }} />
+                <span style={{
+                  fontSize: '0.6rem',
+                  fontWeight: 700,
+                  letterSpacing: '2.5px',
+                  textTransform: 'uppercase',
+                  color: 'rgba(28,21,16,0.8)',
+                }}>
+                  {images[current].title}
+                </span>
+              </motion.div>
+            </AnimatePresence>
+
             <AnimatePresence initial={false} custom={direction}>
               <motion.div
                 key={images[current].id}
