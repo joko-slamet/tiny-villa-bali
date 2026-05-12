@@ -9,10 +9,10 @@ import { createClient } from "@/lib/supabase/client";
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const REGIONS = [
-  { id: "south", label: "South Bali Projects", x: 57, y: 75 },
-  { id: "west",  label: "West Bali Projects",  x: 52, y: 54 },
-  { id: "north", label: "North Bali Projects", x: 70, y: 43 },
-] as const;
+  { id: "north", label: "North Bali Projects", x: 70, y: 43, yMobile: 43 },
+  { id: "west",  label: "West Bali Projects",  x: 52, y: 54, yMobile: 54 },
+  { id: "south", label: "South Bali Projects", x: 55, y: 74, yMobile: 70 },
+];
 
 type RegionId = typeof REGIONS[number]["id"];
 
@@ -24,7 +24,14 @@ interface RegionInfo {
 export default function MapPage() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [regionData, setRegionData] = useState<Record<string, RegionInfo>>({});
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
   const supabase = createClient();
+
+  useEffect(() => {
+    const update = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
     async function fetchRegions() {
@@ -72,12 +79,12 @@ export default function MapPage() {
         </motion.h1>
       </div>
 
-      <div style={{ height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px" }}>
+      <div style={{ height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(16px, 3vw, 40px)" }}>
         <motion.div
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease }}
-          style={{ position: "relative", width: "100%", maxWidth: "calc((100vh - var(--nav-h, 72px) - 80px) * 2594 / 1632)" }}
+          style={{ position: "relative", width: "100%", maxWidth: "calc((100svh - var(--nav-h, 72px) - clamp(32px, 6vw, 80px)) * 2594 / 1632)" }}
         >
           <Image
             src="/assets/images/map.png"
@@ -103,7 +110,7 @@ export default function MapPage() {
                 style={{
                   position: "absolute",
                   left: `${region.x}%`,
-                  top: `${region.y}%`,
+                  top: `${windowWidth < 768 ? region.yMobile : region.y}%`,
                   transform: "translate(-50%, -100%)",
                   zIndex: hovered === region.id ? 100 : 10,
                 }}
@@ -116,8 +123,8 @@ export default function MapPage() {
                     bottom: 0,
                     left: "50%",
                     transform: "translateX(-50%)",
-                    width: 36,
-                    height: 36,
+                    width: "clamp(24px, 3.2vw, 36px)",
+                    height: "clamp(24px, 3.2vw, 36px)",
                     borderRadius: "50%",
                     background: "rgba(184,146,42,0.3)",
                     animation: "pulse-ring 2s ease-in-out infinite",
@@ -129,7 +136,7 @@ export default function MapPage() {
                     transition={{ duration: 0.2 }}
                     style={{ display: "block", cursor: "pointer", position: "relative" }}
                   >
-                    <svg width="36" height="48" viewBox="0 0 28 38" fill="none" style={{ filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))" }}>
+                    <svg width="36" height="48" viewBox="0 0 28 38" fill="none" style={{ width: "clamp(24px, 3.2vw, 36px)", height: "clamp(32px, 4.3vw, 48px)", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))" }}>
                       <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 24 14 24S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="#b8922a" />
                       <circle cx="14" cy="13" r="5.5" fill="#fff" opacity="0.9" />
                     </svg>
