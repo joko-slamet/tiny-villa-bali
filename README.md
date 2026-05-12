@@ -140,3 +140,31 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 4. Klik **Deploy**
 
 Vercel akan otomatis melakukan deploy ulang setiap kali ada push ke branch utama.
+
+---
+
+## 7. Setup Custom Domain (Hostinger → Vercel)
+
+### Di Vercel
+
+1. Buka project di Vercel dashboard
+2. Pergi ke **Settings → Domains**
+3. Masukkan domain kamu (contoh: `namadomain.com`) → klik **Add**
+4. Vercel akan menampilkan dua record DNS yang perlu ditambahkan:
+   - Sebuah **A record** yang mengarah ke IP Vercel (`76.76.21.21`)
+   - Sebuah **CNAME record** untuk subdomain `www` yang mengarah ke `cname.vercel-dns.com`
+
+### Di Hostinger
+
+1. Login ke [hpanel.hostinger.com](https://hpanel.hostinger.com)
+2. Pilih domain kamu → **Kelola** → **DNS / Nameservers**
+3. Tambahkan dua record berikut di bagian **DNS Records**:
+
+| Tipe | Nama | Konten | TTL |
+|------|------|--------|-----|
+| `A` | `@` | `76.76.21.21` | Otomatis |
+| `CNAME` | `www` | `cname.vercel-dns.com` | Otomatis |
+
+4. Simpan perubahan
+
+> Propagasi DNS biasanya memakan waktu **5–30 menit**, namun bisa sampai 24 jam. Setelah aktif, Vercel akan otomatis menerbitkan SSL certificate untuk domain kamu.
