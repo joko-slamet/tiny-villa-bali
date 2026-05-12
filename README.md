@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Animate Mbuchacher
 
-## Getting Started
+Website portofolio dengan animasi berbasis Next.js, Supabase, dan Resend.
 
-First, run the development server:
+## Prasyarat
+
+- Node.js 18+
+- Akun [Supabase](https://supabase.com)
+- Akun [Resend](https://resend.com)
+- Akun [Vercel](https://vercel.com) (untuk deployment)
+
+---
+
+## 1. Clone & Install
+
+```bash
+git clone <repo-url>
+cd animate-mbuchacher2
+npm install
+```
+
+---
+
+## 2. Setup Supabase
+
+1. Buat project baru di [supabase.com/dashboard](https://supabase.com/dashboard)
+2. Setelah project dibuat, buka **Project Settings → API**
+3. Salin nilai berikut:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **anon / public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **service_role key** → `SUPABASE_SERVICE_ROLE_KEY`
+
+> `service_role` key bersifat rahasia — jangan pernah diekspos ke sisi client.
+
+### Setup Database
+
+Buka **SQL Editor** di Supabase dashboard dan jalankan query berikut:
+
+```sql
+-- Tabel untuk data project/properti
+create table public.projects (
+  id          uuid primary key default gen_random_uuid(),
+  name        text,
+  slug        text unique,
+  location    text,
+  region      text,
+  status      text,
+  units       int,
+  available   int,
+  featured    boolean default false,
+  src         text,
+  "order"     int,
+  created_at  timestamptz default now()
+);
+
+-- Tabel untuk slide di hero section halaman utama
+create table public.hero_slides (
+  id          uuid primary key default gen_random_uuid(),
+  src         text,
+  title       text,
+  bg          text,
+  created_at  timestamptz default now()
+);
+```
+
+### Setup Storage Bucket
+
+Masih di Supabase dashboard, buka **Storage** dan buat dua bucket berikut:
+
+| Nama bucket | Public |
+|---|---|
+| `project-images` | ✅ Ya |
+| `hero-images` | ✅ Ya |
+
+Untuk setiap bucket, tambahkan policy agar file bisa diupload dari admin:
+
+1. Klik bucket → **Policies → New Policy**
+2. Pilih template **"Give users access to a folder only to authenticated users"** atau buat manual:
+
+```sql
+-- Contoh policy untuk project-images (ulangi untuk hero-images)
+create policy "Authenticated users can upload"
+on storage.objects for insert
+to authenticated
+with check (bucket_id = 'project-images');
+
+create policy "Public can read"
+on storage.objects for select
+to public
+using (bucket_id = 'project-images');
+
+create policy "Authenticated users can delete"
+on storage.objects for delete
+to authenticated
+using (bucket_id = 'project-images');
+```
+
+---
+
+## 3. Setup Resend
+
+1. Daftar atau login di [resend.com](https://resend.com)
+2. Buka **API Keys → Create API Key**
+3. Salin key yang dihasilkan → `RESEND_API_KEY`
+
+---
+
+## 4. Environment Variables
+
+Salin file contoh lalu isi dengan nilai dari langkah di atas:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+RESEND_API_KEY=your-resend-api-key
+```
+
+---
+
+## 5. Jalankan Lokal
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000) di browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 6. Deploy ke Vercel
 
-## Learn More
+1. Push repository ke GitHub
+2. Buka [vercel.com/new](https://vercel.com/new) dan import repository
+3. Di bagian **Environment Variables**, tambahkan keempat variabel yang sama seperti `.env.local`
+4. Klik **Deploy**
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel akan otomatis melakukan deploy ulang setiap kali ada push ke branch utama.
