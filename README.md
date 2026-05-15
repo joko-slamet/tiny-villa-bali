@@ -1,43 +1,56 @@
-# Tiny Villa Bali
+# Tiny Villa Bali — Panduan Setup
 
-Website Tiny Villa Bali berbasis Next.js, Supabase, dan Resend.
+Dokumen ini memandu Anda dari nol hingga website Tiny Villa Bali berjalan secara online dengan domain sendiri. Ikuti setiap langkah secara berurutan.
 
-## Prasyarat
-
-- Node.js 18+
-- Akun [Supabase](https://supabase.com)
-- Akun [Resend](https://resend.com)
-- Akun [Vercel](https://vercel.com) (untuk deployment)
-
----
-
-## 1. Clone & Install
-
-```bash
-git clone <repo-url>
-cd animate-mbuchacher2
-npm install
-```
+Layanan yang digunakan:
+- **GitHub** — penyimpanan source code
+- **Supabase** — database dan penyimpanan foto
+- **Resend** — pengiriman email dari form kontak
+- **Vercel** — hosting website
+- **Hostinger** — domain
 
 ---
 
-## 2. Setup Supabase
+## Langkah 1 — Ambil Source Code ke Akun GitHub Anda
 
-1. Buat project baru di [supabase.com/dashboard](https://supabase.com/dashboard)
-2. Setelah project dibuat, buka **Project Settings → API**
-3. Salin nilai berikut:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon / public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role key** → `SUPABASE_SERVICE_ROLE_KEY`
+Pertama, Anda perlu menyalin source code website ke akun GitHub pribadi Anda agar bisa dikelola secara mandiri.
 
-> `service_role` key bersifat rahasia — jangan pernah diekspos ke sisi client.
+1. Daftar atau login di [github.com](https://github.com)
+2. Buka halaman [github.com/new/import](https://github.com/new/import)
+3. Di kolom **"Your old repository's clone URL"**, masukkan URL repo berikut:
+   ```
+   https://github.com/joko-slamet/tiny-villa-bali
+   ```
+4. Di kolom **"Repository name"**, beri nama misalnya `tiny-villa-bali`
+5. Pilih **Private** agar kode tidak bisa dilihat publik
+6. Klik **Begin Import**
 
-### Setup Database
+GitHub akan memproses impor secara otomatis. Setelah selesai, seluruh source code sudah berada di bawah kepemilikan akun GitHub Anda — tanpa perlu bantuan developer.
 
-Buka **SQL Editor** di Supabase dashboard dan jalankan query berikut:
+---
+
+## Langkah 2 — Setup Supabase (Database & Penyimpanan Foto)
+
+Supabase digunakan untuk menyimpan data properti dan foto-foto yang ditampilkan di website.
+
+### Buat Akun dan Project
+
+1. Daftar di [supabase.com](https://supabase.com) lalu buat project baru
+2. Pilih region terdekat (misalnya Singapore) dan catat password database Anda
+3. Setelah project siap, buka **Project Settings → API**
+4. Salin tiga nilai berikut — akan digunakan nanti:
+   - **Project URL** → simpan sebagai `NEXT_PUBLIC_SUPABASE_URL`
+   - **anon / public** → simpan sebagai `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **service_role** → simpan sebagai `SUPABASE_SERVICE_ROLE_KEY`
+
+> Jaga kerahasiaan `service_role` key. Key ini memberi akses penuh ke database dan tidak boleh dibagikan.
+
+### Buat Tabel Database
+
+Buka **SQL Editor** di sidebar Supabase, lalu salin dan jalankan query berikut:
 
 ```sql
--- Tabel untuk data project/properti
+-- Tabel data properti
 create table public.projects (
   id          uuid primary key default gen_random_uuid(),
   name        text,
@@ -53,7 +66,7 @@ create table public.projects (
   created_at  timestamptz default now()
 );
 
--- Tabel untuk slide di hero section halaman utama
+-- Tabel slide untuk tampilan utama website
 create table public.hero_slides (
   id          uuid primary key default gen_random_uuid(),
   src         text,
@@ -63,55 +76,57 @@ create table public.hero_slides (
 );
 ```
 
-### Setup Storage Bucket
+### Buat Tempat Penyimpanan Foto
 
-Masih di Supabase dashboard, buka **Storage** dan buat dua bucket berikut:
+1. Buka menu **Storage** di sidebar Supabase
+2. Buat dua bucket berikut dengan menekan **New bucket**:
 
-| Nama bucket | Public |
+| Nama bucket | Akses |
 |---|---|
-| `project-images` | ✅ Ya |
-| `hero-images` | ✅ Ya |
+| `project-images` | Public |
+| `hero-images` | Public |
 
-Untuk setiap bucket, tambahkan policy agar file bisa diupload dari admin:
-
-1. Klik bucket → **Policies → New Policy**
-2. Pilih template **"Give users access to a folder only to authenticated users"** atau buat manual:
+3. Untuk setiap bucket, buka **Policies → New Policy** dan tambahkan tiga policy berikut (ganti nama bucket sesuai):
 
 ```sql
--- Contoh policy untuk project-images (ulangi untuk hero-images)
+-- Izinkan admin mengupload foto
 create policy "Authenticated users can upload"
 on storage.objects for insert
 to authenticated
 with check (bucket_id = 'project-images');
 
+-- Izinkan publik melihat foto
 create policy "Public can read"
 on storage.objects for select
 to public
 using (bucket_id = 'project-images');
 
+-- Izinkan admin menghapus foto
 create policy "Authenticated users can delete"
 on storage.objects for delete
 to authenticated
 using (bucket_id = 'project-images');
 ```
 
----
-
-## 3. Setup Resend
-
-1. Daftar atau login di [resend.com](https://resend.com)
-2. Buka **API Keys → Create API Key**
-3. Salin key yang dihasilkan → `RESEND_API_KEY`
+Ulangi ketiga policy di atas untuk bucket `hero-images`.
 
 ---
 
-## 4. Environment Variables
+## Langkah 3 — Setup Resend (Email)
 
-Salin file contoh lalu isi dengan nilai dari langkah di atas:
+Resend digunakan agar pesan dari form kontak di website masuk ke email Anda.
 
-```bash
-cp .env.example .env.local
-```
+1. Daftar di [resend.com](https://resend.com)
+2. Masuk ke **API Keys → Create API Key**
+3. Salin key yang muncul → simpan sebagai `RESEND_API_KEY`
+
+---
+
+## Langkah 4 — Isi Konfigurasi / Environment Variables *(opsional — hanya jika ingin menjalankan di komputer lokal)*
+
+Semua key yang sudah dikumpulkan dari langkah sebelumnya dimasukkan ke dalam satu file konfigurasi.
+
+Buat file bernama `.env.local` di folder project, lalu isi dengan nilai Anda:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
@@ -120,45 +135,65 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 RESEND_API_KEY=your-resend-api-key
 ```
 
+> File `.env.local` bersifat rahasia dan tidak akan terupload ke GitHub secara otomatis.
+
 ---
 
-## 5. Jalankan Lokal
+## Langkah 5 — Jalankan Website di Komputer Lokal *(opsional — hanya jika ingin menjalankan di komputer lokal)*
+
+Untuk memastikan semuanya berjalan sebelum dipublikasikan, coba jalankan di komputer terlebih dahulu.
+
+Pastikan [Node.js](https://nodejs.org) versi 18 ke atas sudah terinstal, lalu jalankan:
 
 ```bash
+git clone https://github.com/username-anda/tiny-villa-bali.git
+cd tiny-villa-bali
+npm install
 npm run dev
 ```
 
-Buka [http://localhost:3000](http://localhost:3000) di browser.
+Buka [http://localhost:3000](http://localhost:3000) di browser. Jika website tampil, berarti konfigurasi sudah benar.
 
 ---
 
-## 6. Deploy ke Vercel
+## Langkah 6 — Deploy ke Vercel (Publikasikan Website)
 
-1. Push repository ke GitHub
-2. Buka [vercel.com/new](https://vercel.com/new) dan import repository
-3. Di bagian **Environment Variables**, tambahkan keempat variabel yang sama seperti `.env.local`
-4. Klik **Deploy**
+Vercel adalah layanan hosting yang akan membuat website Anda bisa diakses secara online.
 
-Vercel akan otomatis melakukan deploy ulang setiap kali ada push ke branch utama.
+1. Daftar atau login di [vercel.com](https://vercel.com)
+2. Klik **Add New → Project** → pilih **Import Git Repository**
+3. Hubungkan akun GitHub Anda dan pilih repository `tiny-villa-bali`
+4. Sebelum menekan Deploy, scroll ke bawah hingga menemukan bagian **Environment Variables**. Di sini Anda perlu menambahkan keempat variabel konfigurasi satu per satu:
+   - Klik kolom **Name** → ketik nama variabelnya (contoh: `NEXT_PUBLIC_SUPABASE_URL`)
+   - Klik kolom **Value** → tempel nilai yang sudah Anda salin dari Supabase atau Resend
+   - Klik **Add** untuk menyimpan, lalu ulangi untuk variabel berikutnya
+   - Lakukan hingga keempat variabel berikut terisi semua:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `RESEND_API_KEY`
+5. Setelah semua variabel terisi, klik **Deploy**
+
+Website akan online dalam beberapa menit. Setiap kali Anda melakukan perubahan dan push ke GitHub, Vercel akan otomatis memperbarui website.
 
 ---
 
-## 7. Setup Custom Domain (Hostinger → Vercel)
+## Langkah 7 — Hubungkan Domain dari Hostinger
+
+Setelah website online, langkah terakhir adalah menghubungkan domain Anda agar bisa diakses melalui alamat yang Anda miliki.
 
 ### Di Vercel
 
-1. Buka project di Vercel dashboard
+1. Buka project Anda di Vercel dashboard
 2. Pergi ke **Settings → Domains**
-3. Masukkan domain kamu (contoh: `namadomain.com`) → klik **Add**
-4. Vercel akan menampilkan dua record DNS yang perlu ditambahkan:
-   - Sebuah **A record** yang mengarah ke IP Vercel (`76.76.21.21`)
-   - Sebuah **CNAME record** untuk subdomain `www` yang mengarah ke `cname.vercel-dns.com`
+3. Ketik nama domain Anda (contoh: `tinyvillabali.com`) → klik **Add**
+4. Vercel akan menampilkan dua record DNS yang perlu ditambahkan di Hostinger
 
 ### Di Hostinger
 
 1. Login ke [hpanel.hostinger.com](https://hpanel.hostinger.com)
-2. Pilih domain kamu → **Kelola** → **DNS / Nameservers**
-3. Tambahkan dua record berikut di bagian **DNS Records**:
+2. Pilih domain Anda → klik **Kelola** → buka **DNS / Nameservers**
+3. Di bagian **DNS Records**, tambahkan dua baris berikut:
 
 | Tipe | Nama | Konten | TTL |
 |------|------|--------|-----|
@@ -167,4 +202,4 @@ Vercel akan otomatis melakukan deploy ulang setiap kali ada push ke branch utama
 
 4. Simpan perubahan
 
-> Propagasi DNS biasanya memakan waktu **5–30 menit**, namun bisa sampai 24 jam. Setelah aktif, Vercel akan otomatis menerbitkan SSL certificate untuk domain kamu.
+> Setelah disimpan, perubahan DNS biasanya aktif dalam **15–30 menit**, namun bisa memakan waktu hingga 24 jam. Setelah aktif, sertifikat keamanan (SSL/HTTPS) akan dipasang otomatis oleh Vercel — tidak ada langkah tambahan dari Anda.
