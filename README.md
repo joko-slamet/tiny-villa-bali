@@ -116,9 +116,13 @@ Ulangi ketiga policy di atas untuk bucket `hero-images`.
 
 Resend digunakan agar pesan dari form kontak di website masuk ke email Anda.
 
+### Buat API Key
+
 1. Daftar di [resend.com](https://resend.com)
 2. Masuk ke **API Keys → Create API Key**
 3. Salin key yang muncul → simpan sebagai `RESEND_API_KEY`
+
+> Untuk saat ini cukup sampai di sini. **Jangan verifikasi domain dulu** — langkah tersebut baru bisa dilakukan setelah domain terhubung ke Vercel, yaitu di **Langkah 8**.
 
 ---
 
@@ -203,3 +207,14 @@ Setelah website online, langkah terakhir adalah menghubungkan domain Anda agar b
 4. Simpan perubahan
 
 > Setelah disimpan, perubahan DNS biasanya aktif dalam **15–30 menit**, namun bisa memakan waktu hingga 24 jam. Setelah aktif, sertifikat keamanan (SSL/HTTPS) akan dipasang otomatis oleh Vercel — tidak ada langkah tambahan dari Anda.
+
+---
+
+## Langkah 8 — Verifikasi Domain di Resend
+
+Setelah domain terhubung ke Vercel, lakukan verifikasi domain di Resend agar email dari form kontak terkirim dari domain Anda sendiri dan tidak masuk folder spam.
+
+1. Di dashboard Resend, buka **Domains → Add Domain**
+2. Masukkan nama domain Anda (contoh: `tinyvillabali.com`) → klik **Add**
+3. Resend akan mendeteksi domain terhubung ke Vercel dan menawarkan verifikasi otomatis — ikuti klik yang muncul hingga selesai
+4. Status domain akan berubah menjadi **Verified**

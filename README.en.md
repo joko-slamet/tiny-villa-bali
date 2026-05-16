@@ -116,9 +116,13 @@ Repeat all three policies for the `hero-images` bucket.
 
 Resend ensures that messages submitted through the contact form on your website are delivered to your email.
 
+### Create an API Key
+
 1. Sign up at [resend.com](https://resend.com)
 2. Go to **API Keys → Create API Key**
 3. Copy the generated key → save as `RESEND_API_KEY`
+
+> That's all for now. **Do not verify your domain yet** — that step can only be done after your domain is connected to Vercel, which is covered in **Step 8**.
 
 ---
 
@@ -203,3 +207,14 @@ Once the website is live, the final step is connecting your domain so it can be 
 4. Save the changes
 
 > DNS changes typically take effect within **15–30 minutes**, but may take up to 24 hours. Once active, Vercel will automatically install an SSL/HTTPS certificate for your domain — no additional steps required on your end.
+
+---
+
+## Step 8 — Verify Your Domain in Resend
+
+Once your domain is connected to Vercel, verify it in Resend so that emails from the contact form are sent from your own domain and don't end up in spam.
+
+1. In the Resend dashboard, go to **Domains → Add Domain**
+2. Enter your domain name (e.g. `tinyvillabali.com`) → click **Add**
+3. Resend will detect that your domain is connected to Vercel and offer automatic verification — follow the on-screen clicks until it's done
+4. Your domain status will change to **Verified**
